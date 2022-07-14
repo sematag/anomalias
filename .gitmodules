@@ -1,3 +1,0 @@
-[submodule "anomaly-detection-datasets"]
-	path = anomaly-detection-datasets
-	url = https://github.com/GuansongPang/anomaly-detection-datasets

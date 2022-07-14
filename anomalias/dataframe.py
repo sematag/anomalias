@@ -5,7 +5,7 @@ from anomalias import detector as anomdetect, log
 logger = log.logger('Series')
 
 
-class Series(Thread):
+class DataFrame(Thread):
     def __init__(self, id, len, description=None):
         Thread.__init__(self)
         self.name = 'series_id_' + str(id)
@@ -25,7 +25,7 @@ class Series(Thread):
     def run(self):
         while not self.__exit:
             obs = self.__observations.get()
-            self.ad.anom_detect(obs)
+            self.ad.detect(obs)
 
     def append(self, obs):
         self.__observations.put(obs)
