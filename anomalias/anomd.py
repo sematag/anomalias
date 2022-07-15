@@ -72,8 +72,8 @@ class Anomd():
         try:
             if self.__exist_id(id):
                 if self.__dataframes[self.df_id.index(id)].isAlive():
-                    endog = (self.__dataframes[self.df_id.index(id)]).ad.dataFrame
-                    idx_anom = (self.__dataframes[self.df_id.index(id)]).ad.idx_anom
+                    endog = (self.__dataframes[self.df_id.index(id)]).ad.get_dataFrame()
+                    idx_anom = (self.__dataframes[self.df_id.index(id)]).ad.get_id_anom()
                     return endog, idx_anom
                 else:
                     logger.info('Time series is not running, id: %s', id)
