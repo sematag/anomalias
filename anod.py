@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 import anomalias.log as log
-logger = log.logger( 'API' )
+logger = log.logger('API')
 
 from anomalias.anomd import Anomd
 import pandas as pd
@@ -55,15 +55,26 @@ def fit(id: str, data: DataFrame):
 
 @app.post("/detect/{id}")
 async def detect(id: str, data: DataFrame):
-    anomd.append(id, pd.DataFrame(data.dat, index=pd.to_datetime(data.idx)))  # Detection
     try:
+        logger.debug('api.py: call to detect(), data:')
+        logger.debug('\n %s', pd.DataFrame(data.dat, index=pd.to_datetime(data.idx)))
+        anomd.append(id, pd.DataFrame(data.dat, index=pd.to_datetime(data.idx)))  # Detection
+
+        # No agregar nada entre append() y get_detection()
         df, anom = anomd.get_detection(id)
+        logger.debug('api.py: data for detection:')
+        logger.debug('\n %s', df)
+        logger.debug('api.py: anomalies:')
+        logger.debug('\n %s', anom)
+
         df_out = df.rename(columns={0: 'label'})
-        df_out = df_out[anom[0]]
-        print(df_out)
+        df_out = df_out[anom]
+        logger.debug('api.py: anomalies to write:')
+        logger.debug('\n %s', df_out)
+
         influx_write(record=df_out[['label']], data_frame_measurement_name=id)
     except Exception as e:
-        logger.error('%s', e)
+        logger.error('%s', e, exc_info=True)
 
 
 import nest_asyncio

@@ -1,7 +1,7 @@
 import anomalias.log as log
 import anomalias.dataframe as dataframe
 
-logger = log.logger( 'anomd' )
+logger = log.logger('anomd')
 
 class Anomd():
     def __init__(self):

@@ -13,7 +13,9 @@ class Detector:
         self.__len = len
         self.__available = Condition()
         self.__dataFrame = pd.DataFrame([])
-        self.__anom = pd.DataFrame([])
+        self.__anom = pd.DataFrame([],dtype='boolean')
+        self.__dataFrame_last = pd.DataFrame([])
+        self.__anom_last = pd.DataFrame([],dtype='boolean')
 
         self.__training = False
         self.__paused = False
@@ -39,14 +41,14 @@ class Detector:
         with self.__available:
             # Series Update
             if not observations.empty:
-                self.__dataFrame = pd.concat([self.__dataFrame, observations]).iloc[-self.__len:]
+                self.__dataFrame_last = observations[~observations.index.isin(self.__dataFrame.index)]
+                self.__dataFrame = pd.concat([self.__dataFrame, self.__dataFrame_last]).iloc[-self.__len:]
                 # Detection
-                idx_anom = self.__model.detect(observations)
-                self.__anom = pd.concat([self.__anom, idx_anom]).iloc[-self.__len:]
-            print(self.__dataFrame)
+                self.__anom_last = self.__model.detect(self.__dataFrame_last).astype('boolean')
+                self.__anom = pd.concat([self.__anom, self.__anom_last]).iloc[-self.__len:]
             self.__available.notify()
 
     def get_detection(self):
         with self.__available:
             self.__available.wait()
-            return self.__dataFrame, self.__anom
+            return self.__dataFrame_last, self.__anom_last
