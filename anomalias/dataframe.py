@@ -6,13 +6,8 @@ logger = log.logger('Series')
 
 
 class DataFrame(Thread):
-    def __init__(self, id, len, description=None):
+    def __init__(self, id, len):
         Thread.__init__(self)
-        self.name = 'series_id_' + str(id)
-        if description is None:
-            self.description = self.name = 'series_id_' + str(id)
-        else:
-            self.description = description
         self.id = id
         self.ad = anomdetect.Detector(len=len)
 

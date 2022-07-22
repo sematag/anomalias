@@ -7,15 +7,11 @@ class Anomd():
     def __init__(self):
         self.__dataframes = []
         self.df_id = []
-        self.__id = 0
 
-    def add(self, len):
+    def add(self, id, len):
         try:
-            self.__dataframes.append(dataframe.DataFrame(id=self.__id, len=len))
-            self.df_id.append(self.__id)
-            id = self.__id
-            self.__id += 1
-            return id
+            self.__dataframes.append(dataframe.DataFrame(id=id, len=len))
+            self.df_id.append(id)
         except Exception as e:
             logger.error('%s', e)
             raise
@@ -60,11 +56,11 @@ class Anomd():
         except Exception as e:
             logger.error('%s', e)
 
-    def append(self, obs, id):
+    def append(self, id, obs):
         if self.__exist_id(id):
             self.__dataframes[self.df_id.index(id)].append(obs)
 
-    def fit(self, dataFrame, id):
+    def fit(self, id, dataFrame):
         if self.__exist_id(id):
             self.__dataframes[self.df_id.index(id)].ad.fit(dataFrame)
 
@@ -72,9 +68,8 @@ class Anomd():
         try:
             if self.__exist_id(id):
                 if self.__dataframes[self.df_id.index(id)].isAlive():
-                    endog = (self.__dataframes[self.df_id.index(id)]).ad.get_dataFrame()
-                    idx_anom = (self.__dataframes[self.df_id.index(id)]).ad.get_id_anom()
-                    return endog, idx_anom
+                    df, anom = (self.__dataframes[self.df_id.index(id)]).ad.get_detection()
+                    return df, anom
                 else:
                     logger.info('Time series is not running, id: %s', id)
                     return None

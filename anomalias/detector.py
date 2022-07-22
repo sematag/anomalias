@@ -12,10 +12,8 @@ class Detector:
         # Series
         self.__len = len
         self.__available = Condition()
-        # self.endog = np.zeros(self.__len)
         self.__dataFrame = pd.DataFrame([])
-        # self.idx_anom = [False] * len
-        self.__idx_anom = pd.DataFrame([])
+        self.__anom = pd.DataFrame([])
 
         self.__training = False
         self.__paused = False
@@ -25,6 +23,7 @@ class Detector:
             # Model
             logger.info('Creating Anomaly Detector.')
             self.__model = SSM_AD(th, endog, model_type, **kwargs)
+            self.__available.notify()
 
     def adtk_ad(self, model_type, **kargs):
         with self.__available:
@@ -38,19 +37,16 @@ class Detector:
 
     def detect(self, observations):
         with self.__available:
-            self.__available.wait(1)
             # Series Update
-            self.__dataFrame = pd.concat([self.__dataFrame, observations]).iloc[-self.__len:]
-            # Detection
-            idx_anom = self.__model.detect(observations)
-            self.__idx_anom = pd.concat([self.__idx_anom, idx_anom]).iloc[-self.__len:]
+            if not observations.empty:
+                self.__dataFrame = pd.concat([self.__dataFrame, observations]).iloc[-self.__len:]
+                # Detection
+                idx_anom = self.__model.detect(observations)
+                self.__anom = pd.concat([self.__anom, idx_anom]).iloc[-self.__len:]
+            print(self.__dataFrame)
+            self.__available.notify()
 
-    def get_id_anom(self):
+    def get_detection(self):
         with self.__available:
-            self.__available.wait(1)
-            return self.__idx_anom
-
-    def get_dataFrame(self):
-        with self.__available:
-            self.__available.wait(1)
-            return self.__dataFrame
+            self.__available.wait()
+            return self.__dataFrame, self.__anom
