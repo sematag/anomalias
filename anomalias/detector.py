@@ -13,9 +13,7 @@ class Detector:
         self.__len = len
         self.__available = Condition()
         self.__dataFrame = pd.DataFrame([])
-        self.__anom = pd.DataFrame([],dtype='boolean')
-        self.__dataFrame_last = pd.DataFrame([])
-        self.__anom_last = pd.DataFrame([],dtype='boolean')
+        self.__anomalies = pd.DataFrame([], dtype='boolean')
 
         self.__training = False
         self.__paused = False
@@ -40,15 +38,14 @@ class Detector:
     def detect(self, observations):
         with self.__available:
             # Series Update
-            if not observations.empty:
-                self.__dataFrame_last = observations[~observations.index.isin(self.__dataFrame.index)]
-                self.__dataFrame = pd.concat([self.__dataFrame, self.__dataFrame_last]).iloc[-self.__len:]
-                # Detection
-                self.__anom_last = self.__model.detect(self.__dataFrame_last).astype('boolean')
-                self.__anom = pd.concat([self.__anom, self.__anom_last]).iloc[-self.__len:]
+            dataFrame = observations[~observations.index.isin(self.__dataFrame.index)]
+            self.__dataFrame = pd.concat([self.__dataFrame, dataFrame]).iloc[-self.__len:]
+            # Detection
+            anomalies = self.__model.detect(dataFrame).astype('boolean')
+            self.__anomalies = pd.concat([self.__anomalies, anomalies]).iloc[-self.__len:]
             self.__available.notify()
 
+            return dataFrame, anomalies
+
     def get_detection(self):
-        with self.__available:
-            self.__available.wait()
-            return self.__dataFrame_last, self.__anom_last
+        return self.__dataFrame.copy(), self.__anomalies.copy()

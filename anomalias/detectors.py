@@ -3,14 +3,15 @@ import anomalias.dataframe as dataframe
 
 logger = log.logger('anomd')
 
-class Anomd():
+
+class Detectors():
     def __init__(self):
         self.__dataframes = []
         self.df_id = []
 
-    def add(self, id, len):
+    def add(self, id, len, api):
         try:
-            self.__dataframes.append(dataframe.DataFrame(id=id, len=len))
+            self.__dataframes.append(dataframe.DataFrame(id=id, len=len, api=api))
             self.df_id.append(id)
         except Exception as e:
             logger.error('%s', e)
@@ -46,7 +47,7 @@ class Anomd():
     def list_id(self):
         return self.df_id
 
-    def start(self,id):
+    def start(self, id):
         try:
             if self.__exist_id(id):
                 if not self.__dataframes[self.df_id.index(id)].isAlive():
