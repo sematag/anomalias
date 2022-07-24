@@ -1,6 +1,7 @@
 import queue
 from threading import Thread
 from anomalias import detector, log
+import pandas as pd
 
 logger = log.logger('Series')
 
@@ -22,19 +23,19 @@ class DataFrame(Thread):
         while not self.__exit:
             obs = self.__observations.get()
             if not obs.empty:
+
                 dataFrame, anomalies = self.ad.detect(obs)
+
+                if isinstance(anomalies, pd.Series):
+                    anomalies = anomalies.to_frame()[[0] * dataFrame.shape[-1]]
+                    anomalies.columns = dataFrame.columns
 
                 logger.debug('Data for detection:')
                 logger.debug('\n %s', dataFrame)
                 logger.debug('Anomalies:')
                 logger.debug('\n %s', anomalies)
 
-                df_out = dataFrame.rename(columns={0: 'label'})
-                df_out = df_out[anomalies]
-                logger.debug('api.py: anomalies to write:')
-                logger.debug('\n %s', df_out)
-
-                self.__api.write(record=df_out[['label']], data_frame_measurement_name=self.id)
+                self.__api.write(dataFrame, anomalies)
 
 
     def append(self, obs):
