@@ -1,0 +1,89 @@
+/////////////////////////////////////
+// Task - Ejemplo serie Univariada //
+/////////////////////////////////////
+
+import "json"
+import "http"
+import "date"
+
+option task = {name: "ram-anomaly-detection", every: 5m}
+
+measurement = "go_memstats_alloc_bytes_total"
+field = "counter"
+id = measurement
+
+data =
+    from(bucket: "anomalias")
+        |> range(start: date.truncate(t: -task.every, unit: 1m), stop: date.truncate(t: now(), unit: 1m))
+        |> filter(fn: (r) => r["_measurement"] == "${measurement}")
+        |> filter(fn: (r) => r["_field"] == "${field}")
+        |> derivative(unit: 1m, nonNegative: true)
+        |> aggregateWindow(every: 1m, fn: mean)
+        |> yield(name: "ram")
+
+values =
+    data
+        |> findColumn(fn: (key) => true, column: "_value")
+
+index =
+    data
+        |> findColumn(fn: (key) => true, column: "_time")
+
+metrics =
+    data
+        |> findColumn(fn: (key) => true, column: "_measurement")
+
+jsonData = {index: index, values: values, metrics: metrics}
+
+http.post(
+    url: "http://sm-mac.local:8000/detect/${id}",
+    headers: {Authorization: "Bearer mySuPerSecRetTokEn", "Content-type": "application/json"},
+    data: json.encode(v: jsonData),
+)
+
+///////////////////////////////////////
+// Task - Ejemplo serie Multivariada //
+///////////////////////////////////////
+
+import "json"
+import "http"
+import "date"
+import "experimental/array"
+
+option task = {name: "io-anomaly-detection", every: 5m}
+
+id = "Multivariada"
+
+data =
+    from(bucket: "anomalias")
+        |> range(start: date.truncate(t: -task.every, unit: 1m), stop: date.truncate(t: now(), unit: 1m))
+        |> filter(fn: (r) => r._measurement == "boltdb_reads_total" or r._measurement == "boltdb_writes_total")
+        |> filter(fn: (r) => r._field == "counter")
+        |> aggregateWindow(every: 1m, fn: mean)
+        |> group()
+        |> map(
+            fn: (r) => {
+                return {index: r._time, values: r._value, metrics: r._measurement, field: r._field}
+            },
+        )
+        |> yield()
+
+values =
+    data
+        |> findColumn(fn: (key) => true, column: "values")
+
+index =
+    data
+        |> findColumn(fn: (key) => true, column: "index")
+
+metrics =
+    data
+        |> findColumn(fn: (key) => true, column: "metrics")
+
+jsonData = {index: index, values: values, metrics: metrics}
+
+http.post(
+    url: "http://sm-mac.local:8000/detect/${id}",
+    headers: {Authorization: "Bearer mySuPerSecRetTokEn", "Content-type": "application/json"},
+    data: json.encode(v: jsonData),
+)
