@@ -4,6 +4,8 @@ import random
 import plotly.express as px
 import argparse
 import requests
+import time
+
 
 
 class Range(object):
@@ -49,34 +51,29 @@ class carpartsDataGenerator():
 
         self.__addNoise()
 
-        return self.generated_dataset
 
-
-    def writeDataset(self):
+    def writeDataset(self,bucket,org,measure_name):
         
-        headers = list(map(str,np.arange(self.generated_dataset.shape[0])))
-        values = self.generated_dataset
-        
-        items = []
-        for i in range(len(headers)):
+        data_dict = {}
+        data_dict["series"] = []
+        data_dict["value"] = []
+        data_dict["time"] = []
+        series_list = ["serie{}".format(i) for i in range(self.n_series)]
 
-            values_str=""
-            for value in values[i]:
-                values_str+="{},".format(value)
-            values_str = values_str[:-1]
 
-            items.append({
-                        "data_group": "Sells",
-                        "y_axis": "monthly_sells",
-                        "tag": "series_id",
-                        "tag_value": headers[i],
-                        "values": values_str
-                        })
+        for i in range(self.lenght):
+            for j in range(self.n_series):
+                data_dict["series"].append(series_list[j])
+                data_dict["value"].append(str(self.generated_dataset[j,i]))
+                data_dict["time"].append(str(time.time()*1e9))
 
-        url = "http://0.0.0.0:8000/write/"
-        for item in items:
-            response = requests.get(url,item)
-            print(response.content)
+        data_dict["bucket"] = bucket
+        data_dict["org"] = org
+        data_dict["measurement_name"] = measure_name
+
+        url = "http://127.0.0.2:8000/writedb/"
+        response = requests.post(url,json=data_dict)
+        print(response.content)
         
         
 
@@ -92,32 +89,17 @@ if __name__ == "__main__":
     parser.add_argument("--noise_factor", help="Tamaño de las series a generar",type=float,default=0.0,choices=[Range(0.0, 1.0)])
     parser.add_argument("--plot_list", help="Tamaño de las series a generar",type=int,nargs="+",default=[])
     parser.add_argument("--write_influx", help="Escribe datos en influx",type=int,default=0,choices=[0,1])
+    parser.add_argument("--bucket", help="Bucket de influx donde escribir los datos",type=str,default="carparts")
+    parser.add_argument("--org", help="Organizacion de influx donde escribir los datos",type=str,default="fing")
+    parser.add_argument("--measure_name", help="Nombre de la metrica",type=str,default="ventas_mensuales")
     args = parser.parse_args()
 
 
     dataset_path = "./carparts.csv"
     generator = carpartsDataGenerator(dataset_path)
-    
-
-    generated_data = generator.generateDataset(args.n_series,args.lenght,args.noise_factor)
-
-    data_dict = {}
-
-    for i in range(args.n_series):
-
-        data_dict["serie{}".format(i)] = generated_data[i,:]
-
-        if i in args.plot_list:
-            tmp_df = pd.DataFrame(dict(
-                x = np.arange(generated_data.shape[1]),
-                y = generated_data[i,:]
-            ))
-            fig = px.line(tmp_df, x="x", y="y", title="Unsorted Input") 
-            fig.show()
-
-    df = pd.DataFrame.from_dict(data_dict).to_csv("series.csv")
-
+    generator.generateDataset(args.n_series,args.lenght,args.noise_factor)
     if args.write_influx:
-        generator.writeDataset()
+        generator.writeDataset(args.bucket,args.org,args.measure_name)
+
 
 

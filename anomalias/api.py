@@ -10,6 +10,7 @@ from typing import List
 import nest_asyncio
 import uvicorn
 from datetime import datetime
+import time
 
 logger = log.logger('API')
 
@@ -18,6 +19,14 @@ class DataFrame(BaseModel):
     index: list
     values: list
     metrics: List[str]
+
+class CsvData(BaseModel):
+    series: List[str]
+    value: List[str]
+    time: List[str]
+    bucket:  str
+    org: str
+    measurement_name: str
 
 token = "spI_l176puCr13ymJbBWkx8ImeX-SXPOHb1HxJonLoMnMwLrlz4U2Qkoko62aVI5bnisix-DDcEihUzfXcQTAA=="
 org = "fing"
@@ -95,47 +104,25 @@ def start(detectors):
                 logger.error('%s', e, exc_info=True)
 
 
-        
-        """
-        Ruta /write/ para HTTP GET
-        Escribe datos en la base de datos influxdb
-
-        Recibe los siguientes parametros:    
-            -data_group: Nombre de la medida que se realiza (por ejemplo, ventas)
-            -y_axis: Nombre del campo que se mide (ejemplo para carparts, ventas_mensuales)
-            -values: string con valores a registrar en la base (ejemplo 0,2,3,4,1,2,3)
-            -tag: Nombre del tag para la medida (ejemplo para carpats, numero_parte)
-            -tag_value: Valor del tag (ejemplo para carparts, 21047181)
-
-        """
-        @api.get("/write/")
-        def write_db(data_group,y_axis,tag,tag_value,values):
-
-            json_data = []    
-            for value in values.split(","):
-
-                record = [
-                    {
-                        "measurement": data_group,
-                        "tags": {
-                            tag: tag_value
-                        },
-                        "time": datetime.now(),
-                        "fields": {
-                            y_axis:  float(value)
-                        }
-                    }
-                ]
-
-                json_data.append(record)
+        @api.post("/writedb/")
+        def write_db(data: CsvData):
             
-            write_api =  InfluxDBClient(url=influx_url, token=token, org=org, timeout=timeout).write_api()
-            write_api.write(bucket=bucket, org=org, record=json_data)
+            data_dict = {}
+            data_dict["_time"] = list(map(int, map(float, data.time)))
+            data_dict["value"] = list(map(float, data.value))
+            data_dict["series"] = data.series
+            df = pd.DataFrame.from_dict(data_dict)
+            df['_time'] = pd.to_datetime(df._time)
+            df = df.set_index('_time')
+            df.columns = ['series', 'value']
 
-            print(json_data)
-
-            return {"data_group": data_group, "y_axis":y_axis, "tag": tag, "tag_value": tag_value, "values": values.split(",")}
-
+            client  =  InfluxDBClient(url=influx_url, token=token, org=org, timeout=timeout)
+            write_api = client.write_api()
+            write_api.write(data.bucket,data.org,record=df[['series','value']],
+                    data_frame_measurement_name='ventas_mensuales', data_frame_tag_columns=['value'])
+            
+            client.close()
+            return {"request": "ok"}
 
         nest_asyncio.apply()
-        uvicorn.run(api, port=8000, host="0.0.0.0")
+        uvicorn.run(api, port=8000, host="127.0.0.2")
