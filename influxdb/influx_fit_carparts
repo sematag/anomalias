@@ -24,7 +24,7 @@ jsonData = {index: index, values: values, metrics: metrics}
 
 
 http.post(
-    url: "http://127.0.0.1:8000/detect/${id}",
+    url: "http://127.0.0.2:8000/detect/${id}",
     headers: {Authorization: "Bearer mySuPerSecRetTokEn", "Content-type": "application/json"},
     data: json.encode(v: jsonData),
 )
