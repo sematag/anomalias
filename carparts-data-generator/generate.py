@@ -71,7 +71,7 @@ class carpartsDataGenerator():
         data_dict["org"] = org
         data_dict["measurement_name"] = measure_name
 
-        url = "http://127.0.0.2:8000/writedb/"
+        url = "http://127.0.0.2:8000/influx/write"
         response = requests.post(url,json=data_dict)
         print(response.content)
         

@@ -28,7 +28,7 @@ class CsvData(BaseModel):
     org: str
     measurement_name: str
 
-token = "spI_l176puCr13ymJbBWkx8ImeX-SXPOHb1HxJonLoMnMwLrlz4U2Qkoko62aVI5bnisix-DDcEihUzfXcQTAA=="
+token = "-mEXQY9kTDyuKDpAn8V3Kyh7K2ZKrKYCCnNZVs7jtJ96nUUV-83gItPT9cmTdoxDljH0am1oCK7qSqDfD30FTA=="
 org = "fing"
 bucket = "carparts"
 influx_url = "http://localhost:8086"
@@ -104,7 +104,7 @@ def start(detectors):
                 logger.error('%s', e, exc_info=True)
 
 
-        @api.post("/writedb/")
+        @api.post("/influx/write")
         def write_db(data: CsvData):
             
             data_dict = {}
@@ -122,6 +122,10 @@ def start(detectors):
                     data_frame_measurement_name='ventas_mensuales', data_frame_tag_columns=['value'])
             
             client.close()
+            return {"request": "ok"}
+
+        @api.post("/influx/tasks")
+        def send_task(data: CsvData):
             return {"request": "ok"}
 
         nest_asyncio.apply()
