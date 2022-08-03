@@ -1,0 +1,32 @@
+import "json"
+import "http"
+import "date"
+
+data =
+    from(bucket: "carparts")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "ventas_mensuales")
+  |> filter(fn: (r) => r["value"] == "${serie}")
+
+values =
+    data
+        |> findColumn(fn: (key) => true, column: "_value")
+
+index =
+    data
+        |> findColumn(fn: (key) => true, column: "_time")
+
+metrics =
+    data
+        |> findColumn(fn: (key) => true, column: "_measurement")
+
+jsonData = {index: index, values: values, metrics: metrics}
+
+
+http.post(
+    url: "http://127.0.0.1:8000/detect/${id}",
+    headers: {Authorization: "Bearer mySuPerSecRetTokEn", "Content-type": "application/json"},
+    data: json.encode(v: jsonData),
+)
+
+
