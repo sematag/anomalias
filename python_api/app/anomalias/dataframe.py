@@ -40,6 +40,7 @@ class DataFrame(Thread):
 
     def append(self, obs):
         self.__observations.put(obs)
+        self.run()
 
     def exit(self, bol=False):
         self.__exit = bol

@@ -14,5 +14,11 @@ services:
       - DOCKER_INFLUXDB_INIT_ORG=fing
       - DOCKER_INFLUXDB_INIT_BUCKET=series
 
+  api:
+    image: service-api:latest
+    ports:
+      - '8000:8000'
+
+
 volumes:
     influxdb-storage:

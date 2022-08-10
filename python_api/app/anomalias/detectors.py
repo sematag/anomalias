@@ -50,7 +50,7 @@ class Detectors():
     def start(self, id):
         try:
             if self.__exist_id(id):
-                if not self.__dataframes[self.df_id.index(id)].isAlive():
+                if not self.__dataframes[self.df_id.index(id)].is_alive():
                     self.__dataframes[self.df_id.index(id)].start()
                 else:
                     logger.warning('Series is running, id: %s', id)

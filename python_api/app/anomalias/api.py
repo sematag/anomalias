@@ -28,10 +28,10 @@ class CsvData(BaseModel):
     org: str
     measurement_name: str
 
-token = "-mEXQY9kTDyuKDpAn8V3Kyh7K2ZKrKYCCnNZVs7jtJ96nUUV-83gItPT9cmTdoxDljH0am1oCK7qSqDfD30FTA=="
+token = "kw9xrtqg56z1htwVJUJxgGoozZykmVMP3ScKcK3s0MQGYUfNClQtXwe6HL7pWX_T5N0Q0EUVo51wVl00B4Cdjw=="
 org = "fing"
 bucket = "carparts"
-influx_url = "http://localhost:8086"
+influx_url = "http://influxdb:8086"
 timeout = 200
 
 class influx_api():
@@ -118,7 +118,7 @@ def start(detectors):
 
             client  =  InfluxDBClient(url=influx_url, token=token, org=org, timeout=timeout)
             write_api = client.write_api()
-            write_api.write(data.bucket,data.org,record=df[['series','value']],
+            write_api.write(data.bucket,data.org,record=df[['value','series']],
                     data_frame_measurement_name='ventas_mensuales', data_frame_tag_columns=['value'])
             
             client.close()
@@ -129,4 +129,4 @@ def start(detectors):
             return {"request": "ok"}
 
         nest_asyncio.apply()
-        uvicorn.run(api, port=8000, host="127.0.0.2")
+        uvicorn.run(api, port=8000, host="0.0.0.0")
