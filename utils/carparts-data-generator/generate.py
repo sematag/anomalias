@@ -5,7 +5,7 @@ import plotly.express as px
 import argparse
 import requests
 import time
-
+from time import sleep
 
 
 class Range(object):
@@ -65,6 +65,7 @@ class carpartsDataGenerator():
             for j in range(self.n_series):
                 data_dict["series"].append(series_list[j])
                 data_dict["value"].append(str(self.generated_dataset[j,i]))
+                sleep(0.00001)
                 data_dict["time"].append(str(time.time()*1e9))
 
         data_dict["bucket"] = bucket

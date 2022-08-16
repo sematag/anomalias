@@ -57,9 +57,9 @@ class Detectors():
         except Exception as e:
             logger.error('%s', e)
 
-    def append(self, id, obs):
+    def append(self, id, obs, obs_name):
         if self.__exist_id(id):
-            self.__dataframes[self.df_id.index(id)].append(obs)
+            self.__dataframes[self.df_id.index(id)].append(obs, obs_name)
 
     def fit(self, id, dataFrame):
         if self.__exist_id(id):
