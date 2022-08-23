@@ -1,0 +1,90 @@
+{
+    "imports" : 
+    [
+        "http",
+        "json",
+        "date"
+    ],
+
+    "query" : 
+    {
+        "name" : "data",
+
+        "select" : 
+        { 
+            "bucket" : "carparts"
+        },
+
+        "range" : 
+        {
+            "start" : 
+            {
+                "days" : 1,
+                "hours" : 0,
+                "minutes" : 0, 
+                "seconds" : 0
+            },
+            "stop" : 
+            {
+                "days" : 0,
+                "hours" : 1,
+                "minutes" : 0, 
+                "seconds" : 0
+            }
+        },
+
+        "filter" : 
+        {
+            "fields" : 
+            [
+                {
+                    "name" : "_measurement",
+                    "value": "boltdb_reads_total",
+                    "equal": 1
+                },
+                {
+                    "name" : "_field",
+                    "value": "boltdb_writes_total",
+                    "equal": 1
+                }
+            ]
+        }
+    },
+
+    "series": 
+    [
+        {
+            "name" : "values",
+            "query_name" : "data",
+            "column_name" : "_value"
+        },
+        {
+            "name" : "index",
+            "query_name" : "data",
+            "column_name" : "_time"
+        },
+        {
+            "name" : "metrics",
+            "query_name" : "data",
+            "column_name" : "_measurement"
+        }
+    ],
+
+    "payload": 
+    {
+        "name" : "serie0",
+        "columns_names" : 
+        [
+            "values",
+            "index",
+            "metrics"
+        ]
+    },
+
+    "http": 
+    {
+        "api_method" : "fit",
+        "id" : "0",
+        "data_name" : "data"
+    }
+}
