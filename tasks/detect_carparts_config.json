@@ -1,0 +1,108 @@
+{
+    
+    "description" : "Obtiene datos de carparts y llama a la api para detectar anomalias",
+
+    "imports" : 
+    [
+        "http",
+        "json",
+        "date"
+    ],
+
+    "options" : 
+    {
+        "name" : "detect-carparts",
+        "every" : 
+        {
+            "hours" : 10,
+            "minutes" : 0, 
+            "seconds" : 0
+        },
+        "offset" :
+        {
+            "hours" : 0,
+            "minutes" : 0, 
+            "seconds" : 0
+        }
+    },   
+    
+    "query" : 
+    {
+        "name" : "data",
+
+        "select" : 
+        { 
+            "bucket" : "carparts"
+        },
+
+        "range" : 
+        {
+            "start" : 
+            {
+                "hours" : 10,
+                "minutes" : 0, 
+                "seconds" : 0
+            },
+            "stop" : 
+            {
+                "hours" : 0,
+                "minutes" : 0, 
+                "seconds" : 1
+            }
+        },
+
+        "filter" : 
+        {
+            "fields" : 
+            [
+                {
+                    "name" : "_measurement",
+                    "value": "ventas_mensuales",
+                    "equal": 1
+                },
+                {
+                    "name" : "series",
+                    "value": "serie1",
+                    "equal": 1
+                }
+            ]
+        }
+    },
+
+    "series": 
+    [
+        {
+            "name" : "values",
+            "query_name" : "data",
+            "column_name" : "_value"
+        },
+        {
+            "name" : "index",
+            "query_name" : "data",
+            "column_name" : "_time"
+        },
+        {
+            "name" : "metrics",
+            "query_name" : "data",
+            "column_name" : "_measurement"
+        }
+    ],
+
+    "payload": 
+    {
+        "name" : "serie0",
+        "columns_names" : 
+        [
+            "values",
+            "index",
+            "metrics"
+        ]
+    },
+
+    "http": 
+    {
+        "api_method" : "detect",
+        "id" : "0",
+        "data_name" : "data"
+    }
+}

@@ -1,0 +1,5 @@
+{
+    "token" : "kw9xrtqg56z1htwVJUJxgGoozZykmVMP3ScKcK3s0MQGYUfNClQtXwe6HL7pWX_T5N0Q0EUVo51wVl00B4Cdjw==",
+    "influx_url" : "http://localhost:8086/api/v2/tasks",
+    "org_id" : "2f5b9a8a6cba8496"
+}

@@ -10,19 +10,18 @@ class Select:
     bucket: str
 
     def toInfluxFormat(self) -> str:
-        return f"from(bucket: {self.bucket})\n"
+        return f"from(bucket: \"{self.bucket}\")\n"
 
 
 @dataclass
 class Time:
 
-    days: int = 0
     hours: int = 0
     minutes: int = 0
     seconds: int = 0
 
     def toInfluxFormat(self) -> str:
-        return f"-{self.days}d{self.hours}h{self.minutes}m{self.seconds}s"
+        return f"{self.hours}h{self.minutes}m{self.seconds}s"
 
 @dataclass
 class Range:
@@ -31,7 +30,7 @@ class Range:
     stop: Time
 
     def toInfluxFormat(self) -> str:
-            return f"|> range(start: {self.start.toInfluxFormat()}, stop: {self.stop.toInfluxFormat()})\n"
+            return f"|> range(start: -{self.start.toInfluxFormat()}, stop: -{self.stop.toInfluxFormat()})\n"
 
 
 

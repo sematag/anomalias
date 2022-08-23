@@ -1,4 +1,7 @@
 {
+    
+    "description" : "Obtiene datos de carparts y llama a la api para entrenar",
+
     "imports" : 
     [
         "http",
@@ -6,6 +9,23 @@
         "date"
     ],
 
+    "options" : 
+    {
+        "name" : "fit-carparts",
+        "every" : 
+        {
+            "hours" : 10,
+            "minutes" : 0, 
+            "seconds" : 0
+        },
+        "offset" :
+        {
+            "hours" : 0,
+            "minutes" : 0, 
+            "seconds" : 0
+        }
+    },   
+    
     "query" : 
     {
         "name" : "data",
@@ -19,17 +39,15 @@
         {
             "start" : 
             {
-                "days" : 1,
-                "hours" : 0,
+                "hours" : 10,
                 "minutes" : 0, 
                 "seconds" : 0
             },
             "stop" : 
             {
-                "days" : 0,
-                "hours" : 1,
+                "hours" : 0,
                 "minutes" : 0, 
-                "seconds" : 0
+                "seconds" : 1
             }
         },
 
@@ -39,12 +57,12 @@
             [
                 {
                     "name" : "_measurement",
-                    "value": "boltdb_reads_total",
+                    "value": "ventas_mensuales",
                     "equal": 1
                 },
                 {
-                    "name" : "_field",
-                    "value": "boltdb_writes_total",
+                    "name" : "series",
+                    "value": "serie1",
                     "equal": 1
                 }
             ]
@@ -72,7 +90,7 @@
 
     "payload": 
     {
-        "name" : "serie0",
+        "name" : "serie1",
         "columns_names" : 
         [
             "values",
