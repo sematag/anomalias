@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM facundogp/anom-api:v2-fastFM
 
 WORKDIR /code
 
@@ -10,4 +10,4 @@ COPY ./app ./app
 
 WORKDIR /code/app
 
-CMD [ "python3", "main.py"] 
+CMD [ "python", "main.py"] 
