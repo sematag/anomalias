@@ -9,7 +9,7 @@ logger = log.logger( 'tsmodels' )
 
 class SSM_AD:
     def __init__(self, th, endog, model_type, params=None, **kwargs):
-        if model_type is 'SARIMAX':
+        if model_type == 'SARIMAX':
             logger.info('Creating SARIMAX model.')
             self.__train_serie = endog
             self.__th = th

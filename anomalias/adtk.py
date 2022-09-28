@@ -8,10 +8,10 @@ logger = log.logger('adtk')
 
 class Adtk_AD:
     def __init__(self, model_type, **kargs):
-        if model_type is 'SeasonalAD':
+        if model_type == 'SeasonalAD':
             logger.info('Creating SeasonalAD model.')
             self.__model = SeasonalAD()
-        elif model_type is 'MinClusterAD':
+        elif model_type == 'MinClusterAD':
             logger.info('Creating MinClusterAD model.')
             self.__model = MinClusterDetector(KMeans(**kargs))
         else:
