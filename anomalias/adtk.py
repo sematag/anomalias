@@ -6,8 +6,9 @@ from anomalias import log
 logger = log.logger('adtk')
 
 
-class Adtk_AD:
+class AdtkAD:
     def __init__(self, model_type, **kargs):
+        self.__df_train = []
         if model_type == 'SeasonalAD':
             logger.info('Creating SeasonalAD model.')
             self.__model = SeasonalAD()
@@ -20,9 +21,12 @@ class Adtk_AD:
 
     def fit(self, train_data):
         logger.info('Fitting model.')
-        self.__train_serie = train_data
+        self.__df_train = train_data
         self.__model.fit(train_data)
 
     def detect(self, observations):
-        idx_anom = self.__model.detect(observations)
-        return idx_anom
+        idx_anomaly = self.__model.detect(observations)
+        anomaly_th_lower = None
+        anomaly_th_upper = None
+
+        return idx_anomaly, anomaly_th_lower, anomaly_th_upper

@@ -7,10 +7,10 @@ logger = log.logger('Series')
 
 
 class DataFrame(Thread):
-    def __init__(self, id, len, api):
-        Thread.__init__(self, name=id)
-        self.id = id
-        self.ad = detector.Detector(len=len)
+    def __init__(self, df_id, df_len, api):
+        Thread.__init__(self, name=df_id)
+        self.id = df_id
+        self.ad = detector.Detector(df_len=df_len)
 
         self.__exit = False
         self.__paused = False
@@ -24,19 +24,18 @@ class DataFrame(Thread):
             obs = self.__observations.get()
             if not obs.empty:
 
-                dataFrame, anomalies = self.ad.detect(obs)
+                df, anomalies = self.ad.detect(obs)
 
                 if isinstance(anomalies, pd.Series):
-                    anomalies = anomalies.to_frame()[[0] * dataFrame.shape[-1]]
-                    anomalies.columns = dataFrame.columns
+                    anomalies = anomalies.to_frame()[[0] * df.shape[-1]]
+                    anomalies.columns = df.columns
 
                 logger.debug('Data for detection:')
-                logger.debug('\n %s', dataFrame)
+                logger.debug('\n %s', df)
                 logger.debug('Anomalies:')
                 logger.debug('\n %s', anomalies)
 
-                self.__api.write(dataFrame, anomalies)
-
+                self.__api.write(df, anomalies)
 
     def append(self, obs):
         self.__observations.put(obs)

@@ -3,7 +3,7 @@ import os
 
 logging.basicConfig(level=logging.DEBUG,
                     format="%(asctime)s %(levelname)s %(name)s %(process)d: [%(threadName)s] %(message)s",
-                    #filename=os.path.dirname(__file__) + '/../anomalias.log',
+                    # filename=os.path.dirname(__file__) + '/../anomalias.log',
                     filename='/tmp/anomalias.log',
                     filemode='w')
 
