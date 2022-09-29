@@ -42,7 +42,7 @@ class InfluxApi:
         for metric in df:
             df_out = df[metric].to_frame()
             anomalies_out = anomalies[metric]
-            anomalies_out = anomalies[anomalies_out].to_frame().rename(columns={metric: 'anomaly'}).astype(int)
+            anomalies_out = anomalies[anomalies_out].rename(columns={metric: 'anomaly'}).astype(int)
             logger.debug('api.py: anomalies to write (metric %s):', metric)
             logger.debug('\n %s', df_out)
             logger.debug('\n %s', anomalies_out)
