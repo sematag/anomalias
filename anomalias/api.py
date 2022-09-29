@@ -71,13 +71,16 @@ def start(detectors):
         detectors.add(df_len=df_len, df_id=df_id, api=influx_api)
 
     @api.post("/setAD")
-    def set_ad(df_id: str, model_id: str):
+    def set_ad(df_id: str, model_id: str, data: DataFrame):
         if model_id == 'MinClusterAD':
             model = AdtkAD(model_id, n_clusters=2)
             detectors.set_ad(df_id, model)
         elif model_id == 'ExpAD':
+            df = pd.DataFrame(list(zip(data.values, data.metrics)),
+                              columns=['values', 'metrics'], index=pd.to_datetime(data.index))
+            df = df.pivot(columns='metrics', values='values')
             model = ExpAD(th=1,
-                          df=[],
+                          df=df,
                           model_type="Exp",
                           seasonal_periods=288)
             detectors.set_ad(df_id, model)
