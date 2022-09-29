@@ -45,8 +45,10 @@ class Detector:
             df = observations[~observations.index.isin(self.__dataFrame.index)]
             self.__dataFrame = pd.concat([self.__dataFrame, df]).iloc[-self.__len:]
             # Detection
-            anomalies, anomaly_th_lower, anomaly_th_upper = self.__model.detect(df).astype('boolean')
+            anomalies, anomaly_th_lower, anomaly_th_upper = self.__model.detect(df)
+            anomalies = anomalies.astype('boolean')
             self.__anomalies = pd.concat([self.__anomalies, anomalies]).iloc[-self.__len:]
+
             if anomaly_th_lower is not None and anomaly_th_upper is not None:
                 self.__anomaly_th_lower = pd.concat([self.__anomaly_th_lower, anomaly_th_lower]).iloc[-self.__len:]
                 self.__anomaly_th_upper = pd.concat([self.__anomaly_th_upper, anomaly_th_upper]).iloc[-self.__len:]

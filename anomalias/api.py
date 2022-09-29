@@ -25,6 +25,7 @@ bucket = config.get("influx", "bucket")
 influx_url = config.get("influx", "influx_url")
 timeout = config.get("influx", "timeout")
 
+logger.debug('%s:', influx_url)
 
 class DataFrame(BaseModel):
     index: list
@@ -37,7 +38,7 @@ class InfluxApi:
         self.__client = InfluxDBClient(url=influx_url, token=token, org=org, timeout=timeout)
         self.__write_api = self.__client.write_api()
 
-    def write(self, df, anomalies):
+    def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper):
         for metric in df:
             df_out = df[metric].to_frame()
             anomalies_out = anomalies[metric].to_frame().rename(columns={metric: 'anomaly'}).astype(int)
@@ -48,6 +49,13 @@ class InfluxApi:
                                    data_frame_tag_columns=None)
             self.__write_api.write(bucket, org, record=anomalies_out, data_frame_measurement_name=metric,
                                    data_frame_tag_columns=None)
+            if anomaly_th_lower is not None and anomaly_th_upper is not None:
+                anomaly_th_lower_out = anomaly_th_lower[metric].to_frame()
+                anomaly_th_upper_out = anomaly_th_upper[metric].to_frame()
+                self.__write_api.write(bucket, org, record=anomaly_th_lower_out, data_frame_measurement_name=metric,
+                                       data_frame_tag_columns=None)
+                self.__write_api.write(bucket, org, record=anomaly_th_upper_out, data_frame_measurement_name=metric,
+                                       data_frame_tag_columns=None)
 
     def close(self):
         self.__client.close()
@@ -59,7 +67,7 @@ def start(detectors):
     @api.post("/newTS")
     def new_ts(df_len: int, df_id: str):
         influx_api = InfluxApi()
-        detectors.add(len=df_len, df_id=df_id, api=influx_api)
+        detectors.add(df_len=df_len, df_id=df_id, api=influx_api)
 
     @api.post("/setAD")
     def set_ad(df_id: str, model_id: str):
@@ -77,7 +85,7 @@ def start(detectors):
     def start_ad(df_id: str):
         detectors.start(df_id=df_id)
 
-    @api.post("/fit/{id}")
+    @api.post("/fit/{df_id}")
     def fit(df_id: str, data: DataFrame):
         df = pd.DataFrame(list(zip(data.values, data.metrics)),
                           columns=['values', 'metrics'], index=pd.to_datetime(data.index))
@@ -88,7 +96,7 @@ def start(detectors):
 
         detectors.fit(df_id, df)
 
-    @api.post("/detect/{id}")
+    @api.post("/detect/{df_id}")
     async def detect(df_id: str, data: DataFrame):
         try:
             df = pd.DataFrame(list(zip(data.values, data.metrics)),

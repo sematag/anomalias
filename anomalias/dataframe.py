@@ -24,7 +24,7 @@ class DataFrame(Thread):
             obs = self.__observations.get()
             if not obs.empty:
 
-                df, anomalies = self.ad.detect(obs)
+                df, anomalies, anomaly_th_lower, anomaly_th_upper = self.ad.detect(obs)
 
                 if isinstance(anomalies, pd.Series):
                     anomalies = anomalies.to_frame()[[0] * df.shape[-1]]
@@ -35,7 +35,7 @@ class DataFrame(Thread):
                 logger.debug('Anomalies:')
                 logger.debug('\n %s', anomalies)
 
-                self.__api.write(df, anomalies)
+                self.__api.write(df, anomalies, anomaly_th_lower, anomaly_th_upper)
 
     def append(self, obs):
         self.__observations.put(obs)
