@@ -22,6 +22,11 @@ class Detector:
         self.__training = False
         self.__paused = False
 
+    def set_model(self, model):
+        with self.__available:
+            self.__model = model
+            self.__available.notify()
+
     # def ssm_ad(self, th, df, model_type, **kwargs):
     #     with self.__available:
     #         # Model
@@ -49,10 +54,6 @@ class Detector:
             anomalies, anomaly_th_lower, anomaly_th_upper = self.__model.detect(df)
             anomalies = anomalies.astype('boolean')
 
-            logger.info('Model detection results:')
-            logger.info('\n %s', anomalies)
-            logger.info('\n %s', anomaly_th_lower)
-
             self.__anomalies = pd.concat([self.__anomalies, anomalies]).iloc[-self.__len:]
 
             if anomaly_th_lower is not None and anomaly_th_upper is not None:
@@ -66,7 +67,3 @@ class Detector:
     def get_detection(self):
         return self.__dataFrame.copy(), self.__anomalies.copy()
 
-    def set_ad(self, model):
-        with self.__available:
-            self.__model = model
-            self.__available.notify()

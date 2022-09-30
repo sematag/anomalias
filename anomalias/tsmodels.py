@@ -12,7 +12,7 @@ logger = log.logger('ssmad')
 
 
 class SsmAD:
-    def __init__(self, th, df, model_type, params=None, **kwargs):
+    def __init__(self, th, df, params=None, **kwargs):
         logger.info('Setting SARIMAX model.')
         self.__th = th
         self.__model = SARIMAX(df, **kwargs)
@@ -56,6 +56,10 @@ class SsmAD:
 
         predicted_mean = prediction.predicted_mean.iloc[-len(df):]
         predicted_sigma = np.sqrt(prediction.var_pred_mean.iloc[-len(df):])
+
+        logger.info('Model detection results:')
+        logger.info('\n %s', predicted_mean)
+        logger.info('\n %s', anomaly_th_lower)
 
         idx_anomaly = np.abs(df.iloc[0].values - predicted_mean.values) > (self.__th * predicted_sigma).values
 

@@ -20,7 +20,7 @@ class Detectors:
     def set_ad(self, df_id, model):
         try:
             if self.__exist_id(df_id):
-                (self.__dataframes[self.__df_id.index(df_id)]).ad.set_ad(model)
+                (self.__dataframes[self.__df_id.index(df_id)]).ad.set_model(model)
         except Exception as e:
             logger.error('%s', e)
             return None

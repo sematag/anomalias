@@ -75,7 +75,7 @@ def start(detectors):
     def set_ad(df_id: str, model_id: str, data: DataFrame):
         if model_id == 'MinClusterAD':
             model = AdtkAD(model_id, n_clusters=2)
-            detectors.set_ad(df_id, model)
+            detectors.set_model(df_id, model)
         elif model_id == 'ExpAD':
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
                               columns=['values', 'metrics'], index=pd.to_datetime(data.index))
@@ -87,7 +87,7 @@ def start(detectors):
                           model_type="Exp",
                           seasonal=12,
                           initialization_method='concentrated')
-            detectors.set_ad(df_id, model)
+            detectors.set_model(df_id, model)
         elif model_id == 'SsmAD':
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
                               columns=['values', 'metrics'], index=pd.to_datetime(data.index))
@@ -102,7 +102,7 @@ def start(detectors):
                           model_type="SARIMAX",
                           order=(1, 1, 2),
                           seasonal_periods=12)
-            detectors.set_ad(df_id, model)
+            detectors.set_model(df_id, model)
 
     @api.post("/startAD")
     def start_ad(df_id: str):
