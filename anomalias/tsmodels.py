@@ -54,8 +54,11 @@ class SsmAD:
 
         prediction = self.__model_fit.get_prediction()
 
-        predicted_mean = prediction.predicted_mean.loc[df.index:]
-        predicted_sigma = np.sqrt(prediction.var_pred_mean.loc[df.index:])
+        predicted_mean = prediction.predicted_mean
+        predicted_mean = predicted_mean[df.index.isin(predicted_mean.index)]
+
+        predicted_sigma = np.sqrt(prediction.var_pred_mean)
+        predicted_sigma = predicted_sigma[df.index.isin(predicted_sigma.index)]
 
         idx_anomaly = np.abs(df.values - predicted_mean.values) > (self.__th * predicted_sigma).values
 
