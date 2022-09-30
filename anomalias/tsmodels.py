@@ -80,12 +80,6 @@ class SsmAD:
         anomaly_th_upper = pd.DataFrame(anomaly_th_upper,
                                         columns=df.columns, index=df.index)
 
-        logger.info('Model detection:')
-        logger.info('\n %s', anomaly_th_lower)
-        logger.info('\n %s', idx_anomaly)
-
-        exit(1)
-
         return idx_anomaly, anomaly_th_lower, anomaly_th_upper
 
     def get_pred_vars(self):
