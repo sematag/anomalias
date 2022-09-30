@@ -94,6 +94,9 @@ def start(detectors):
             df = df.pivot(columns='metrics', values='values')
             df = df.asfreq(pd.infer_freq(df.index))
 
+            logger.debug('api.py: call to set_ad(), data:')
+            logger.debug('\n %s', df)
+
             model = SsmAD(th=5,
                           df=df,
                           model_type="SARIMAX",
