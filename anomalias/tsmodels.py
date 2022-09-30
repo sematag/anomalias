@@ -54,8 +54,8 @@ class SsmAD:
 
         prediction = self.__model_fit.get_prediction()
 
-        predicted_mean = prediction.predicted_mean.iloc[-df.len:].to_frame()
-        predicted_sigma = np.sqrt(prediction.var_pred_mean.iloc[-df.len:].to_frame())
+        predicted_mean = prediction.predicted_mean.iloc[-len(df):].to_frame()
+        predicted_sigma = np.sqrt(prediction.var_pred_mean.iloc[-len(df):].to_frame())
 
         logger.info('1111: %s', predicted_mean)
         logger.info('2222: %s', self.__th * predicted_sigma)
