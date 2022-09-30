@@ -56,11 +56,12 @@ class SsmAD:
 
         predicted_mean = prediction.predicted_mean
         predicted_sigma = np.sqrt(prediction.var_pred_mean)
-        logger.info('TTTTTTTTMMMMPPPPPP: %s', predicted_mean)
-        logger.info('TTTTTTTTMMMMPPPPPP: %s', predicted_sigma)
-        logger.info('TTTTTTTTMMMMPPPPPP: %s', df)
+        logger.info('1111: %s', predicted_mean)
+        logger.info('2222: %s', predicted_sigma)
+        logger.info('3333: %s', df)
 
         idx_anomaly = np.abs(df - predicted_mean) > self.__th * predicted_sigma
+        logger.info('4444: %s', df)
         anomaly_th_lower = prediction.predicted_mean - self.__th * predicted_sigma
         anomaly_th_upper = prediction.predicted_mean + self.__th * predicted_sigma
 
