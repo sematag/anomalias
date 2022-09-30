@@ -54,14 +54,19 @@ class Detector:
             logger.debug('\n %s', df)
 
             # Detection
-            anomalies, anomaly_th_lower, anomaly_th_upper = self.__model.detect(df)
-            anomalies = anomalies.astype('boolean')
+            if not df.empty:
+                anomalies, anomaly_th_lower, anomaly_th_upper = self.__model.detect(df)
+                anomalies = anomalies.astype('boolean')
 
-            self.__anomalies = pd.concat([self.__anomalies, anomalies]).iloc[-self.__len:]
+                self.__anomalies = pd.concat([self.__anomalies, anomalies]).iloc[-self.__len:]
 
-            if anomaly_th_lower is not None and anomaly_th_upper is not None:
-                self.__anomaly_th_lower = pd.concat([self.__anomaly_th_lower, anomaly_th_lower]).iloc[-self.__len:]
-                self.__anomaly_th_upper = pd.concat([self.__anomaly_th_upper, anomaly_th_upper]).iloc[-self.__len:]
+                if anomaly_th_lower is not None and anomaly_th_upper is not None:
+                    self.__anomaly_th_lower = pd.concat([self.__anomaly_th_lower, anomaly_th_lower]).iloc[-self.__len:]
+                    self.__anomaly_th_upper = pd.concat([self.__anomaly_th_upper, anomaly_th_upper]).iloc[-self.__len:]
+            else:
+                anomalies = df.copy()
+                anomaly_th_lower = None
+                anomaly_th_upper = None
 
             self.__available.notify()
 
