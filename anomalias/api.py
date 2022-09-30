@@ -40,7 +40,7 @@ class InfluxApi:
         self.__write_api = self.__client.write_api()
 
     def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper):
-        if not df.empty():
+        if not df.empty:
             for metric in df:
                 df_out = df[metric].to_frame()
                 anomalies_out = anomalies[metric]
