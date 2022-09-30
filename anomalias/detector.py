@@ -58,10 +58,6 @@ class Detector:
             anomaly_th_lower.columns = self.__dataFrame.columns
             anomaly_th_upper.columns = self.__dataFrame.columns
 
-            logger.info('Model detection:')
-            logger.info('\n %s', type(anomalies))
-            logger.info('\n %s', type(anomaly_th_lower))
-
             self.__anomalies = pd.concat([self.__anomalies, anomalies]).iloc[-self.__len:]
 
             if anomaly_th_lower is not None and anomaly_th_upper is not None:
