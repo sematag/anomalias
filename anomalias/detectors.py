@@ -17,7 +17,7 @@ class Detectors:
             logger.error('%s', e)
             raise
 
-    def set_ad(self, df_id, model):
+    def set_model(self, df_id, model):
         try:
             if self.__exist_id(df_id):
                 (self.__dataframes[self.__df_id.index(df_id)]).ad.set_model(model)
