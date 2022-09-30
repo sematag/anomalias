@@ -40,27 +40,28 @@ class InfluxApi:
         self.__write_api = self.__client.write_api()
 
     def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper):
-        for metric in df:
-            df_out = df[metric].to_frame()
-            anomalies_out = anomalies[metric]
-            anomalies_out = anomalies[anomalies_out].rename(columns={metric: 'anomaly'}).astype(int)
-            logger.debug('api.py: anomalies to write (metric %s):', metric)
-            logger.debug('\n %s', df_out)
-            logger.debug('\n %s', anomalies_out)
-            self.__write_api.write(bucket, org, record=df_out, data_frame_measurement_name=metric,
-                                   data_frame_tag_columns=None)
-            self.__write_api.write(bucket, org, record=anomalies_out, data_frame_measurement_name=metric,
-                                   data_frame_tag_columns=None)
-            if anomaly_th_lower is not None and anomaly_th_upper is not None:
-                anomaly_th_lower_out = anomaly_th_lower[metric].to_frame()
-                anomaly_th_lower_out = anomaly_th_lower_out.rename(columns={metric: 'anomalyThL'})
-                anomaly_th_upper_out = anomaly_th_upper[metric].to_frame()
-                anomaly_th_upper_out = anomaly_th_upper_out.rename(columns={metric: 'anomalyThU'})
+        if not df.empty():
+            for metric in df:
+                df_out = df[metric].to_frame()
+                anomalies_out = anomalies[metric]
+                anomalies_out = anomalies[anomalies_out].rename(columns={metric: 'anomaly'}).astype(int)
+                logger.debug('api.py: anomalies to write (metric %s):', metric)
+                logger.debug('\n %s', df_out)
+                logger.debug('\n %s', anomalies_out)
+                self.__write_api.write(bucket, org, record=df_out, data_frame_measurement_name=metric,
+                                       data_frame_tag_columns=None)
+                self.__write_api.write(bucket, org, record=anomalies_out, data_frame_measurement_name=metric,
+                                       data_frame_tag_columns=None)
+                if anomaly_th_lower is not None and anomaly_th_upper is not None:
+                    anomaly_th_lower_out = anomaly_th_lower[metric].to_frame()
+                    anomaly_th_lower_out = anomaly_th_lower_out.rename(columns={metric: 'anomalyThL'})
+                    anomaly_th_upper_out = anomaly_th_upper[metric].to_frame()
+                    anomaly_th_upper_out = anomaly_th_upper_out.rename(columns={metric: 'anomalyThU'})
 
-                self.__write_api.write(bucket, org, record=anomaly_th_lower_out, data_frame_measurement_name=metric,
-                                       data_frame_tag_columns=None)
-                self.__write_api.write(bucket, org, record=anomaly_th_upper_out, data_frame_measurement_name=metric,
-                                       data_frame_tag_columns=None)
+                    self.__write_api.write(bucket, org, record=anomaly_th_lower_out, data_frame_measurement_name=metric,
+                                           data_frame_tag_columns=None)
+                    self.__write_api.write(bucket, org, record=anomaly_th_upper_out, data_frame_measurement_name=metric,
+                                           data_frame_tag_columns=None)
 
     def close(self):
         self.__client.close()
