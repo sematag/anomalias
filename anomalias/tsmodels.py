@@ -72,6 +72,12 @@ class SsmAD:
         anomaly_th_lower = predicted_mean - self.__th * predicted_sigma
         anomaly_th_upper = predicted_mean + self.__th * predicted_sigma
 
+        logger.info('Model detection:')
+        logger.info('\n %s', anomaly_th_lower)
+        logger.info('\n %s', idx_anomaly)
+
+        exit(1)
+
         return idx_anomaly, anomaly_th_lower, anomaly_th_upper
 
     def get_pred_vars(self):
