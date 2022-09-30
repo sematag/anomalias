@@ -72,13 +72,17 @@ class SsmAD:
         idx_anomaly = pd.DataFrame(idx_anomaly,
                                    columns=df.columns, index=df.index)
 
-        anomaly_th_lower = predicted_mean - self.__th * predicted_sigma
-        anomaly_th_upper = predicted_mean + self.__th * predicted_sigma
+        anomaly_th_lower = predicted_mean.values - self.__th * predicted_sigma.values
+        anomaly_th_upper = predicted_mean.values + self.__th * predicted_sigma.values
+
+        anomaly_th_lower = pd.DataFrame(anomaly_th_lower,
+                                        columns=df.columns, index=df.index)
+        anomaly_th_upper = pd.DataFrame(anomaly_th_upper,
+                                        columns=df.columns, index=df.index)
 
         logger.info('Model detection:')
-        logger.info('\n %s', predicted_mean)
-        logger.info('\n %s', self.__th)
-        logger.info('\n %s', self.__th * predicted_sigma)
+        logger.info('\n %s', anomaly_th_lower)
+        logger.info('\n %s', idx_anomaly)
 
         exit(1)
 
