@@ -73,8 +73,9 @@ class SsmAD:
         anomaly_th_upper = predicted_mean + self.__th * predicted_sigma
 
         logger.info('Model detection:')
-        logger.info('\n %s', anomaly_th_lower)
-        logger.info('\n %s', idx_anomaly)
+        logger.info('\n %s', predicted_mean)
+        logger.info('\n %s', self.__th)
+        logger.info('\n %s', self.__th * predicted_sigma)
 
         exit(1)
 
