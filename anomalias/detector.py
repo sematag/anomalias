@@ -44,9 +44,14 @@ class Detector:
             # Series Update
             df = observations[~observations.index.isin(self.__dataFrame.index)]
             self.__dataFrame = pd.concat([self.__dataFrame, df]).iloc[-self.__len:]
+
             # Detection
             anomalies, anomaly_th_lower, anomaly_th_upper = self.__model.detect(df)
             anomalies = anomalies.astype('boolean')
+
+            logger.debug('Model detection results:')
+            logger.debug('\n %s', anomalies)
+            logger.debug('\n %s', anomaly_th_lower)
 
             self.__anomalies = pd.concat([self.__anomalies, anomalies]).iloc[-self.__len:]
 

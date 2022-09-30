@@ -41,7 +41,6 @@ class InfluxApi:
 
     def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper):
         for metric in df:
-            logger.info('api.py: anomalies to write: %s:', anomaly_th_lower)
             df_out = df[metric].to_frame()
             anomalies_out = anomalies[metric]
             anomalies_out = anomalies[anomalies_out].rename(columns={metric: 'anomaly'}).astype(int)
