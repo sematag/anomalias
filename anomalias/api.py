@@ -92,7 +92,7 @@ def start(detectors):
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
                               columns=['values', 'metrics'], index=pd.to_datetime(data.index))
             df = df.pivot(columns='metrics', values='values')
-            df = df.asfreq(pd.infer_freq(df.index))
+            #df = df.asfreq(pd.infer_freq(df.index))
 
             logger.debug('api.py: call to set_ad(), data:')
             logger.debug('\n %s', df)
@@ -113,7 +113,7 @@ def start(detectors):
         df = pd.DataFrame(list(zip(data.values, data.metrics)),
                           columns=['values', 'metrics'], index=pd.to_datetime(data.index))
         df = df.pivot(columns='metrics', values='values')
-        df = df.asfreq(pd.infer_freq(df.index))
+        #df = df.asfreq(pd.infer_freq(df.index))
 
         logger.debug('api.py: call to fit(), data:')
         logger.debug('\n %s', df)
@@ -126,7 +126,7 @@ def start(detectors):
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
                               columns=['values', 'metrics'], index=pd.to_datetime(data.index))
             df = df.pivot(columns='metrics', values='values')
-            df = df.asfreq(pd.infer_freq(df.index))
+            #df = df.asfreq(pd.infer_freq(df.index))
 
             logger.debug('api.py: call to detect(), data:')
             logger.debug('\n %s', df)
