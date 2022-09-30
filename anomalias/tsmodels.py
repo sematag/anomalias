@@ -60,8 +60,8 @@ class SsmAD:
         predicted_sigma = np.sqrt(prediction.var_pred_mean)
         predicted_sigma = predicted_sigma[predicted_sigma.index.isin(df.index)]
 
-        predicted_mean.columns = self.df.columns
-        predicted_sigma.columns = self.df.columns
+        predicted_mean.columns = df.columns
+        predicted_sigma.columns = df.columns
 
         if isinstance(predicted_mean, pd.Series):
             predicted_mean = predicted_mean.to_frame()
