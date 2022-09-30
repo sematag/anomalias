@@ -54,10 +54,6 @@ class Detector:
             anomalies, anomaly_th_lower, anomaly_th_upper = self.__model.detect(df)
             anomalies = anomalies.astype('boolean')
 
-            anomalies.columns = self.__dataFrame.columns
-            anomaly_th_lower.columns = self.__dataFrame.columns
-            anomaly_th_upper.columns = self.__dataFrame.columns
-
             self.__anomalies = pd.concat([self.__anomalies, anomalies]).iloc[-self.__len:]
 
             if anomaly_th_lower is not None and anomaly_th_upper is not None:
