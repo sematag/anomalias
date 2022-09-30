@@ -50,6 +50,9 @@ class Detector:
             df = observations[~observations.index.isin(self.__dataFrame.index)]
             self.__dataFrame = pd.concat([self.__dataFrame, df]).iloc[-self.__len:]
 
+            logger.debug('detector.py: call to detect(), data:')
+            logger.debug('\n %s', df)
+
             # Detection
             anomalies, anomaly_th_lower, anomaly_th_upper = self.__model.detect(df)
             anomalies = anomalies.astype('boolean')
