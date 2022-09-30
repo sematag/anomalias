@@ -26,8 +26,6 @@ class DataFrame(Thread):
 
                 df, anomalies, anomaly_th_lower, anomaly_th_upper = self.ad.detect(obs)
 
-                logger.debug('\n %s', anomalies)
-
                 if isinstance(anomalies, pd.Series):
                     anomalies = anomalies.to_frame()[[0] * df.shape[-1]]
                     anomalies.columns = df.columns
