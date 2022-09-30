@@ -66,11 +66,6 @@ class SsmAD:
 
         idx_anomaly = np.abs(df.values - predicted_mean.values) > (self.__th * predicted_sigma).values
 
-        logger.info('Model detection:')
-        logger.info('\n %s', df.values)
-        logger.info('\n %s', predicted_mean.values)
-        logger.info('\n %s', (self.__th * predicted_sigma).values)
-
         idx_anomaly = pd.DataFrame(idx_anomaly,
                                    columns=df.columns, index=df.index)
 
