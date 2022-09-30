@@ -53,7 +53,10 @@ class InfluxApi:
                                    data_frame_tag_columns=None)
             if anomaly_th_lower is not None and anomaly_th_upper is not None:
                 anomaly_th_lower_out = anomaly_th_lower[metric].to_frame()
+                anomaly_th_lower_out = anomaly_th_lower_out.rename(columns={metric: 'anomalyThL'})
                 anomaly_th_upper_out = anomaly_th_upper[metric].to_frame()
+                anomaly_th_upper_out = anomaly_th_upper_out.rename(columns={metric: 'anomalyThU'})
+
                 self.__write_api.write(bucket, org, record=anomaly_th_lower_out, data_frame_measurement_name=metric,
                                        data_frame_tag_columns=None)
                 self.__write_api.write(bucket, org, record=anomaly_th_upper_out, data_frame_measurement_name=metric,
