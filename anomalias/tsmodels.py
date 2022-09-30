@@ -60,7 +60,7 @@ class SsmAD:
         idx_anomaly = np.abs(df.iloc[0].values - predicted_mean.values) > (self.__th * predicted_sigma).values
 
         idx_anomaly = pd.DataFrame(idx_anomaly,
-                                   columns=['metrics'], index=df.index)
+                                   columns=df.columns, index=df.index)
 
         anomaly_th_lower = prediction.predicted_mean - self.__th * predicted_sigma
         anomaly_th_upper = prediction.predicted_mean + self.__th * predicted_sigma
