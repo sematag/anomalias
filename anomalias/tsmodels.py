@@ -54,20 +54,16 @@ class SsmAD:
 
         prediction = self.__model_fit.get_prediction()
 
-        predicted_mean = prediction.predicted_mean.iloc[-len(df):]
-        predicted_sigma = np.sqrt(prediction.var_pred_mean.iloc[-len(df):])
+        predicted_mean = prediction.predicted_mean.loc[df.index:]
+        predicted_sigma = np.sqrt(prediction.var_pred_mean.loc[df.index:])
 
-        logger.info('Model detection results:')
-        logger.info('\n %s', predicted_mean)
-        logger.info('\n %s', anomaly_th_lower)
-
-        idx_anomaly = np.abs(df.iloc[0].values - predicted_mean.values) > (self.__th * predicted_sigma).values
+        idx_anomaly = np.abs(df.values - predicted_mean.values) > (self.__th * predicted_sigma).values
 
         idx_anomaly = pd.DataFrame(idx_anomaly,
                                    columns=df.columns, index=df.index)
 
-        anomaly_th_lower = prediction.predicted_mean - self.__th * predicted_sigma
-        anomaly_th_upper = prediction.predicted_mean + self.__th * predicted_sigma
+        anomaly_th_lower = predicted_mean - self.__th * predicted_sigma
+        anomaly_th_upper = predicted_mean + self.__th * predicted_sigma
 
         return idx_anomaly, anomaly_th_lower, anomaly_th_upper
 
