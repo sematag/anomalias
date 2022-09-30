@@ -1,7 +1,7 @@
 """
 Time Series Models
 """
-#from statsmodels.tsa.api import ExponentialSmoothing, SimpleExpSmoothing, Holt
+# from statsmodels.tsa.api import ExponentialSmoothing, SimpleExpSmoothing, Holt
 from statsmodels.tsa.statespace.api import SARIMAX, ExponentialSmoothing
 
 from anomalias import log
@@ -57,9 +57,10 @@ class SsmAD:
         predicted_mean = prediction.predicted_mean.iloc[-len(df):]
         predicted_sigma = np.sqrt(prediction.var_pred_mean.iloc[-len(df):])
 
-
         idx_anomaly = np.abs(df.iloc[0].values - predicted_mean.values) > (self.__th * predicted_sigma).values
-        logger.info('idx anom: %s', idx_anomaly)
+
+        idx_anomaly = pd.DataFrame(idx_anomaly,
+                                   columns=['metrics'], index=df.index)
 
         anomaly_th_lower = prediction.predicted_mean - self.__th * predicted_sigma
         anomaly_th_upper = prediction.predicted_mean + self.__th * predicted_sigma
