@@ -60,6 +60,7 @@ class SsmAD:
         idx_anomaly = np.abs(df - predicted_mean) > self.__th * predicted_sigma
         anomaly_th_lower = prediction.predicted_mean - self.__th * predicted_sigma
         anomaly_th_upper = prediction.predicted_mean + self.__th * predicted_sigma
+        logger.info('TTTTTTTTMMMMPPPPPP: %s', idx_anomaly)
 
         return idx_anomaly, anomaly_th_lower, anomaly_th_upper
 
