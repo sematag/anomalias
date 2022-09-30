@@ -27,6 +27,7 @@ timeout = config.get("influx", "timeout")
 
 logger.debug('%s:', influx_url)
 
+
 class DataFrame(BaseModel):
     index: list
     values: list
@@ -79,10 +80,25 @@ def start(detectors):
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
                               columns=['values', 'metrics'], index=pd.to_datetime(data.index))
             df = df.pivot(columns='metrics', values='values')
+            df = df.asfreq(pd.infer_freq(df.index))
+
             model = ExpAD(th=1,
                           df=df,
                           model_type="Exp",
-                          seasonal_periods=288)
+                          seasonal=12,
+                          initialization_method='concentrated')
+            detectors.set_ad(df_id, model)
+        elif model_id == 'SsmAD':
+            df = pd.DataFrame(list(zip(data.values, data.metrics)),
+                              columns=['values', 'metrics'], index=pd.to_datetime(data.index))
+            df = df.pivot(columns='metrics', values='values')
+            df = df.asfreq(pd.infer_freq(df.index))
+
+            model = SsmAD(th=5,
+                          df=df,
+                          model_type="SARIMAX",
+                          order=(1, 1, 2),
+                          seasonal_periods=12)
             detectors.set_ad(df_id, model)
 
     @api.post("/startAD")
@@ -94,6 +110,7 @@ def start(detectors):
         df = pd.DataFrame(list(zip(data.values, data.metrics)),
                           columns=['values', 'metrics'], index=pd.to_datetime(data.index))
         df = df.pivot(columns='metrics', values='values')
+        df = df.asfreq(pd.infer_freq(df.index))
 
         logger.debug('api.py: call to fit(), data:')
         logger.debug('\n %s', df)
@@ -106,6 +123,7 @@ def start(detectors):
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
                               columns=['values', 'metrics'], index=pd.to_datetime(data.index))
             df = df.pivot(columns='metrics', values='values')
+            df = df.asfreq(pd.infer_freq(df.index))
 
             logger.debug('api.py: call to detect(), data:')
             logger.debug('\n %s', df)
