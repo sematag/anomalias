@@ -61,6 +61,13 @@ class SsmAD:
         prediction = self.__model_fit.get_prediction()
 
         predicted_mean = prediction.predicted_mean
+
+        logger.info('########################')
+        logger.debug('%s', df)
+        logger.debug('%s', predicted_mean)
+
+        logger.info('########################')
+
         predicted_mean = predicted_mean[predicted_mean.index.isin(df.index)]
 
         predicted_sigma = np.sqrt(prediction.var_pred_mean)
@@ -72,12 +79,6 @@ class SsmAD:
         if isinstance(predicted_mean, pd.Series):
             predicted_mean = predicted_mean.to_frame()
             predicted_sigma = predicted_sigma.to_frame()
-
-        logger.info('########################')
-        logger.debug('%s', df)
-        logger.debug('%s', predicted_mean)
-
-        logger.info('########################')
 
         idx_anomaly = np.abs(df.values - predicted_mean.values) > (self.__th * predicted_sigma).values
 
