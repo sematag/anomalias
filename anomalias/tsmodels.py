@@ -47,12 +47,12 @@ class SsmAD:
 
     def detect(self, df):
         if self.__init:
-            logger.info('__model_fit.apply() - tsmodels.py')
+            logger.debug('__model_fit.apply() - tsmodels.py')
             self.__model_fit.apply(endog=df, refit=False)
             self.__init = False
         else:
             try:
-                logger.info('__model_fit.extend() - tsmodels.py')
+                logger.debug('__model_fit.extend() - tsmodels.py')
                 self.__model_fit = self.__model_fit.extend(df)
             except ValueError as ve:
                 logger.debug('%s', ve)
