@@ -50,7 +50,11 @@ class SsmAD:
             self.__model_fit.apply(endog=df, refit=False)
             self.__init = False
         else:
-            self.__model_fit = self.__model_fit.extend(df)
+            try:
+                self.__model_fit = self.__model_fit.extend(df)
+            except ValueError as ve:
+                logger.debug('%s', ve)
+                self.__model_fit.apply(endog=df, refit=False)
 
         prediction = self.__model_fit.get_prediction()
 
