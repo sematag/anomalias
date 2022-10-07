@@ -42,7 +42,7 @@ class DataModel(BaseModel):
     freq: str
     threshold: float = None
     model_type: str = None
-    order: str = None
+    order: list = None
     params: list = None
 
 
