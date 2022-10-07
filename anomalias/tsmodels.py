@@ -1,7 +1,6 @@
 """
 Time Series Models
 """
-# from statsmodels.tsa.api import ExponentialSmoothing, SimpleExpSmoothing, Holt
 from statsmodels.tsa.statespace.api import SARIMAX, ExponentialSmoothing
 
 from anomalias import log
@@ -12,7 +11,7 @@ logger = log.logger('ssmad')
 
 
 class SsmAD:
-    def __init__(self, th, df, params=None, **kwargs):
+    def __init__(self, df, th, params=None, **kwargs):
         logger.info('Setting SARIMAX model.')
         self.__th = th
         self.__model = SARIMAX(df, **kwargs)
@@ -47,12 +46,10 @@ class SsmAD:
 
     def detect(self, df):
         if self.__init:
-            logger.debug('__model_fit.apply() - tsmodels.py')
             self.__model_fit.apply(endog=df, refit=False)
             self.__init = False
         else:
             try:
-                logger.debug('__model_fit.extend() - tsmodels.py')
                 self.__model_fit = self.__model_fit.extend(df)
             except ValueError as ve:
                 logger.debug('%s', ve)
@@ -61,13 +58,6 @@ class SsmAD:
         prediction = self.__model_fit.get_prediction()
 
         predicted_mean = prediction.predicted_mean
-
-        logger.info('########################')
-        logger.debug('%s', df)
-        logger.debug('%s', predicted_mean)
-
-        logger.info('########################')
-
         predicted_mean = predicted_mean[predicted_mean.index.isin(df.index)]
 
         predicted_sigma = np.sqrt(prediction.var_pred_mean)
@@ -136,7 +126,6 @@ class ExpAD:
                                       'smoothing_seasonal': self.__model_fit.params['smoothing_seasonal']}):
             self.__model_fit = self.__model.fit()
 
-        # prediction_error = self.__model_fit.resid
         idx_anomaly = self.__model_fit.resid > self.__th
 
         self.__model_fit.fittedvalues.fillna(0.0, inplace=True)

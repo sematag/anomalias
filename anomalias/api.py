@@ -32,6 +32,8 @@ class DataFrame(BaseModel):
     index: list
     values: list
     metrics: List[str]
+    freq: str
+    params: list
 
 
 class InfluxApi:
@@ -84,7 +86,7 @@ def start(detectors):
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
                               columns=['values', 'metrics'], index=pd.to_datetime(data.index))
             df = df.pivot(columns='metrics', values='values')
-            df = df.asfreq('5T')
+            df = df.asfreq(data.freq)
 
             model = ExpAD(th=1,
                           df=df,
@@ -96,16 +98,9 @@ def start(detectors):
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
                               columns=['values', 'metrics'], index=pd.to_datetime(data.index))
             df = df.pivot(columns='metrics', values='values')
-            df = df.asfreq('5T')
+            df = df.asfreq(data.freq)
 
-            logger.debug('api.py: call to set_ad(), data:')
-            logger.debug('\n %s', df)
-
-            model = SsmAD(th=5,
-                          df=df,
-                          model_type="SARIMAX",
-                          order=(1, 1, 2),
-                          seasonal_periods=12)
+            model = SsmAD(df=df, **data.params)
             detectors.set_model(df_id, model)
 
     @api.post("/startAD")
