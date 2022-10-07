@@ -48,7 +48,7 @@ class SsmAD:
 
     def detect(self, df):
         if self.__init:
-            self.__model_fit.apped(endog=df, refit=False)
+            self.__model_fit.append(endog=df, refit=False)
             self.__init = False
         else:
             try:
