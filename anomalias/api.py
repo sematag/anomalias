@@ -33,7 +33,16 @@ class DataFrame(BaseModel):
     values: list
     metrics: List[str]
     freq: str
-    params: list
+
+
+class DataModel(BaseModel):
+    index: list
+    values: list
+    metrics: List[str]
+    freq: str
+    th: float = None
+    model_type: str = None
+    order: str = None
 
 
 class InfluxApi:
@@ -78,7 +87,7 @@ def start(detectors):
         detectors.add(df_len=df_len, df_id=df_id, api=influx_api)
 
     @api.post("/setAD")
-    def set_ad(df_id: str, model_id: str, data: DataFrame):
+    def set_ad(df_id: str, model_id: str, data: DataModel):
         if model_id == 'MinClusterAD':
             model = AdtkAD(model_id, n_clusters=2)
             detectors.set_model(df_id, model)
