@@ -61,7 +61,7 @@ class SsmAD:
 
         predicted_mean = prediction.predicted_mean
         logger.debug('################')
-        logger.debug('%s', self.__model_fit.endog)
+        logger.debug('%s', predicted_mean)
         predicted_mean = predicted_mean[predicted_mean.index.isin(df.index)]
 
         predicted_sigma = np.sqrt(prediction.var_pred_mean)
