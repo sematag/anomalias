@@ -24,6 +24,7 @@ org = config.get("influx", "org")
 bucket = config.get("influx", "bucket")
 influx_url = config.get("influx", "influx_url")
 timeout = config.get("influx", "timeout")
+port = config.get("influx", "port")
 
 logger.debug('%s:', influx_url)
 
@@ -139,7 +140,7 @@ def start(detectors):
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
                               columns=['values', 'metrics'], index=pd.to_datetime(data.index))
             df = df.pivot(columns='metrics', values='values')
-            df = df.asfreq('5T')
+            df = df.asfreq(data.freq)
 
             logger.debug('api.py: call to detect(), data:')
             logger.debug('\n %s', df)
@@ -149,4 +150,4 @@ def start(detectors):
             logger.error('%s', e, exc_info=True)
 
     nest_asyncio.apply()
-    uvicorn.run(api, port=8000, host="0.0.0.0")
+    uvicorn.run(api, port=port, host="0.0.0.0")
