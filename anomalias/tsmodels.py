@@ -24,7 +24,7 @@ class SsmAD:
             self.__model.update(params=params)
             self.__model_fit = self.__model.filter()
 
-        logger.debug('%s', self.__model_fit.endog)
+        logger.debug('%s', self.__model_fit.fittedvalues)
 
     def fit(self, df):
         # Fit params
