@@ -24,7 +24,7 @@ org = config.get("influx", "org")
 bucket = config.get("influx", "bucket")
 influx_url = config.get("influx", "influx_url")
 timeout = config.get("influx", "timeout")
-port = config.get("influx", "port")
+port = int(config.get("influx", "port"))
 
 logger.debug('%s:', influx_url)
 
