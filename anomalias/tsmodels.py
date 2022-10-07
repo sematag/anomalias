@@ -48,14 +48,14 @@ class SsmAD:
 
     def detect(self, df):
         if self.__init:
-            self.__model_fit.append(endog=df, refit=False)
+            self.__model_fit = self.__model_fit.apply(endog=df, refit=False)
             self.__init = False
         else:
             try:
                 self.__model_fit = self.__model_fit.extend(df)
             except ValueError as ve:
                 logger.debug('%s', ve)
-                self.__model_fit.append(endog=df, refit=False)
+                self.__model_fit = self.__model_fit.apply(endog=df, refit=False)
 
         prediction = self.__model_fit.get_prediction()
 
