@@ -24,7 +24,7 @@ class SsmAD:
             self.__model.update(params=params)
             self.__model_fit = self.__model.filter()
 
-        logger.debug('%s', self.__model_fit.fittedvalues)
+        # logger.debug('%s', self.__model_fit.fittedvalues)
 
     def fit(self, df):
         # Fit params
@@ -60,8 +60,6 @@ class SsmAD:
         prediction = self.__model_fit.get_prediction()
 
         predicted_mean = prediction.predicted_mean
-        logger.debug('################')
-        logger.debug('%s', predicted_mean)
         predicted_mean = predicted_mean[predicted_mean.index.isin(df.index)]
 
         predicted_sigma = np.sqrt(prediction.var_pred_mean)
