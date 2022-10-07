@@ -24,6 +24,8 @@ class SsmAD:
             self.__model.update(params=params)
             self.__model_fit = self.__model.filter()
 
+        logger.debug('%s', self.__model_fit.endog)
+
     def fit(self, df):
         # Fit params
         self.__model_fit.apply(endog=df, refit=True)
@@ -58,6 +60,8 @@ class SsmAD:
         prediction = self.__model_fit.get_prediction()
 
         predicted_mean = prediction.predicted_mean
+        logger.debug('################')
+        logger.debug('%s', self.__model_fit.endog)
         predicted_mean = predicted_mean[predicted_mean.index.isin(df.index)]
 
         predicted_sigma = np.sqrt(prediction.var_pred_mean)
@@ -84,10 +88,6 @@ class SsmAD:
                                         columns=df.columns, index=df.index)
 
         return idx_anomaly, anomaly_th_lower, anomaly_th_upper
-
-    def get_pred_vars(self):
-        pred = self.__model_fit.get_prediction()
-        return pred.predicted_mean, self.__th * np.sqrt(pred.var_pred_mean)
 
     def set_th(self, th):
         self.__th = th
