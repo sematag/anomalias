@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.DEBUG,
 logging.captureWarnings(True)
 
 console = logging.StreamHandler()
-console.setLevel(logging.INFO)
+console.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter('%(levelname)s: [%(threadName)s] %(message)s')
 console.setFormatter(formatter)
