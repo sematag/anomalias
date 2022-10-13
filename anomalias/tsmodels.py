@@ -72,18 +72,19 @@ class SsmAD:
             predicted_mean = predicted_mean.to_frame()
             predicted_sigma = predicted_sigma.to_frame()
 
-        idx_anomaly = np.abs(df.values - predicted_mean.values) > (self.__th * predicted_sigma).values
-
-        idx_anomaly = pd.DataFrame(idx_anomaly,
-                                   columns=df.columns, index=df.index)
-
         anomaly_th_lower = predicted_mean.values - self.__th * predicted_sigma.values
+        anomaly_th_lower.clip(lower=0, inplace=True)
         anomaly_th_upper = predicted_mean.values + self.__th * predicted_sigma.values
 
         anomaly_th_lower = pd.DataFrame(anomaly_th_lower,
                                         columns=df.columns, index=df.index)
         anomaly_th_upper = pd.DataFrame(anomaly_th_upper,
                                         columns=df.columns, index=df.index)
+
+        idx_anomaly = (df > anomaly_th_upper) | (df < anomaly_th_lower)
+
+        #idx_anomaly = pd.DataFrame(idx_anomaly,
+                                   #columns=df.columns, index=df.index)
 
         return idx_anomaly, anomaly_th_lower, anomaly_th_upper
 
