@@ -1,3 +1,5 @@
+import configparser
+
 from fastapi import FastAPI
 import anomalias.log as log
 
@@ -28,12 +30,17 @@ class CsvData(BaseModel):
     org: str
     measurement_name: str
 
-token = "kw9xrtqg56z1htwVJUJxgGoozZykmVMP3ScKcK3s0MQGYUfNClQtXwe6HL7pWX_T5N0Q0EUVo51wVl00B4Cdjw=="
-org = "fing"
-bucket = "carparts"
-influx_url = "http://influxdb:8086"
-timeout = 200
 
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+influx_url = config['influx']['url']
+token = config['influx']['token']
+org = config['influx']['org']
+timeout = config['influx']['timeout']
+
+api_host = config['api']['host']
+api_port = config['api']['port']
 
 class InfluxApi:
     """
@@ -87,7 +94,7 @@ class InfluxApi:
         @api.post("/fit/{id}")
         def fit(id: str, data: DataFrame):
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
-                                columns =['values', 'metrics'], index=pd.to_datetime(data.index))
+                              columns=['values', 'metrics'], index=pd.to_datetime(data.index))
             df = df.pivot(columns='metrics', values='values')
 
             logger.debug('api.py: call to fit(), data:')
@@ -130,7 +137,8 @@ class InfluxApi:
 
         @api.post("/influx/tasks")
         def send_task(data: CsvData):
+            #  TODO: Agregar
             return {"request": "ok"}
 
         nest_asyncio.apply()
-        uvicorn.run(api, port=8000, host="0.0.0.0")
+        uvicorn.run(api, port=int(api_port), host=api_host)
