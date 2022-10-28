@@ -27,15 +27,13 @@ class CsvData(BaseModel):
     org: str
     measurement_name: str
 
-
 config = configparser.ConfigParser()
 config.read('config.ini')
-
-print(config.sections())
 
 influx_url = config['influx']['url']
 token = config['influx']['token']
 org = config['influx']['org']
+bucket = config['influx']['bucket']
 timeout = config['influx']['timeout']
 
 api_host = config['anomaly_app']['host']

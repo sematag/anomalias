@@ -6,7 +6,6 @@ logger = log.logger('detect')
 
 class Detectors:
     def __init__(self):
-        # TODO use a dictionary instead of two lists
         self.__dataframes = []
         self.df_id = []
 

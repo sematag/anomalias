@@ -26,19 +26,18 @@ class DataQueue(Thread):
         while not self.__exit:
             obs = self.__observations.get()
             if not obs.empty:
-
-                dataFrame, anomalies = self.ad.detect(obs)
+                data, anomalies = self.ad.detect(obs)
 
                 if isinstance(anomalies, pd.Series):
-                    anomalies = anomalies.to_frame()[[0] * dataFrame.shape[-1]]
-                    anomalies.columns = dataFrame.columns
+                    anomalies = anomalies.to_frame()[[0] * data.shape[-1]]
+                    anomalies.columns = data.columns
 
                 logger.debug('Data for detection:')
-                logger.debug('\n %s', dataFrame)
+                logger.debug('\n %s', data)
                 logger.debug('Anomalies:')
                 logger.debug('\n %s', anomalies)
 
-                self.__api.write(dataFrame, anomalies, self.__obs_name)
+                self.__api.write(data, anomalies, self.__obs_name)
 
     def append(self, obs, obs_name):
         self.__observations.put(obs)
