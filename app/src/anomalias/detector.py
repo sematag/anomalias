@@ -8,6 +8,9 @@ logger = log.logger('Detector')
 
 
 class Detector:
+    """
+    Anomaly detector class
+    """
     def __init__(self, len):
         # Series
         self.__len = len
@@ -21,12 +24,13 @@ class Detector:
     def ssm_ad(self, th, endog, model_type, **kwargs):
         with self.__available:
             # Model
-            logger.info('Creating Anomaly Detector.')
+            logger.info('Creating SSM Anomaly Detector.')
             self.__model = SSM_AD(th, endog, model_type, **kwargs)
             self.__available.notify()
 
     def adtk_ad(self, model_type, **kargs):
         with self.__available:
+            logger.info('Creating ADTK Anomaly Detector.')
             self.__model = Adtk_AD(model_type, **kargs)
             self.__available.notify()
 

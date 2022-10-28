@@ -9,10 +9,9 @@ from pydantic import BaseModel
 from typing import List
 import nest_asyncio
 import uvicorn
-from datetime import datetime
-import time
 
 logger = log.logger('API')
+
 
 class DataFrame(BaseModel):
     index: list
@@ -35,7 +34,11 @@ bucket = "carparts"
 influx_url = "http://influxdb:8086"
 timeout = 200
 
-class influx_api():
+
+class InfluxApi:
+    """
+    API para el envío de datos a influxdb
+    """
     def __init__(self):
         self.__client = InfluxDBClient(url=influx_url, token=token, org=org, timeout=timeout)
         self.__write_api = self.__client.write_api()
@@ -49,45 +52,37 @@ class influx_api():
 
             logger.debug('api.py: anomalies to write (metric %s):', metric)
             logger.debug('\n %s', df_out)
-            self.__write_api.write(bucket,org,
-                                record=df_out, 
-                                data_frame_measurement_name=metric, 
-                                data_frame_tag_columns=["series"])
+            self.__write_api.write(bucket, org, record=df_out,
+                                   data_frame_measurement_name=metric, data_frame_tag_columns=["series"])
 
     def close(self):
         self.__client.close()
 
-def start(detectors):
+    def start(self, detectors):
 
         api = FastAPI()
 
         @api.post("/newTS/{id}")
         def newTS(id: str):
-            api = influx_api()
+            api = InfluxApi()
             detectors.add(len=0, id=id, api=api)
 
-
         @api.post("/setAD/{name}/{id}")
-        def setAD(name : str, id: str):
+        def setAD(name: str, id: str):
             if name == "adtk":
                 detectors.adtk_ad(id=id, model_type='MinClusterAD', n_clusters=2)
             
             elif name == "fm":
-                #Agregar factorization machine a detectors
+                # Agregar factorization machine a detectors
                 pass
-
-
 
         @api.post("/start/{id}")
         def start(id: str):
             detectors.start(id=id)
-
         
         @api.post("/stop/{id}")
         def stop(id: str):
             detectors.remove(id=id)
-
-
 
         @api.post("/fit/{id}")
         def fit(id: str, data: DataFrame):
@@ -99,7 +94,6 @@ def start(detectors):
             logger.debug('\n %s', df)
 
             detectors.fit(id, df)
-
 
         @api.post("/detect/{id}")
         async def detect(id: str, data: DataFrame):
@@ -116,14 +110,11 @@ def start(detectors):
             except Exception as e:
                 logger.error('%s', e, exc_info=True)
 
-
         @api.post("/influx/write")
         def write_db(data: CsvData):
             
-            data_dict = {}
-            data_dict["_time"] = list(map(int, map(float, data.time)))
-            data_dict["ventas"] = list(map(float, data.value))
-            data_dict["series"] = data.series
+            data_dict = {"_time": list(map(int, map(float, data.time))), "ventas": list(map(float, data.value)),
+                         "series": data.series}
             df = pd.DataFrame.from_dict(data_dict)
             df['_time'] = pd.to_datetime(df._time)
             df = df.set_index('_time')
@@ -131,9 +122,8 @@ def start(detectors):
 
             client  =  InfluxDBClient(url=influx_url, token=token, org=org, timeout=timeout)
             write_api = client.write_api()
-            write_api.write(data.bucket,data.org,record=df,
-                    data_frame_measurement_name='ventas_mensuales', 
-                    data_frame_tag_columns=['series'])
+            write_api.write(data.bucket, data.org, record=df,
+                            data_frame_measurement_name='ventas_mensuales', data_frame_tag_columns=['series'])
             
             client.close()
             return {"request": "ok"}

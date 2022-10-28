@@ -4,14 +4,15 @@ import anomalias.dataframe as dataframe
 logger = log.logger('anomd')
 
 
-class Detectors():
+class Detectors:
     def __init__(self):
+        # TODO use a dictionary instead of two lists
         self.__dataframes = []
         self.df_id = []
 
     def add(self, id, len, api):
         try:
-            self.__dataframes.append(dataframe.DataFrame(id=id, len=len, api=api))
+            self.__dataframes.append(dataframe.DataQueue(id=id, len=len, api=api))
             self.df_id.append(id)
         except Exception as e:
             logger.error('%s', e)

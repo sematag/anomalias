@@ -6,9 +6,9 @@ import pandas as pd
 logger = log.logger('Series')
 
 
-class DataFrame(Thread):
-    def __init__(self, id, len, api):
-        Thread.__init__(self, name=id)
+class DataQueue(Thread):
+    def __init__(self, id: str, len: int, api: InfluxApi):
+        super(Thread, self).__init__(self, name=id)
         self.id = id
         self.ad = detector.Detector(len=len)
 
