@@ -1,7 +1,10 @@
 import queue
 from threading import Thread
-from anomalias import detector, log
 import pandas as pd
+
+from . import detector
+from . import log
+from .api import InfluxApi
 
 logger = log.logger('Series')
 
@@ -36,7 +39,6 @@ class DataQueue(Thread):
                 logger.debug('\n %s', anomalies)
 
                 self.__api.write(dataFrame, anomalies, self.__obs_name)
-
 
     def append(self, obs, obs_name):
         self.__observations.put(obs)

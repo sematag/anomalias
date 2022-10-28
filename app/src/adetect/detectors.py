@@ -1,7 +1,7 @@
-import anomalias.log as log
-import anomalias.dataframe as dataframe
+from . import log
+from . import dataqueue
 
-logger = log.logger('anomd')
+logger = log.logger('detect')
 
 
 class Detectors:
@@ -12,7 +12,7 @@ class Detectors:
 
     def add(self, id, len, api):
         try:
-            self.__dataframes.append(dataframe.DataQueue(id=id, len=len, api=api))
+            self.__dataframes.append(dataqueue.DataQueue(id=id, len=len, api=api))
             self.df_id.append(id)
         except Exception as e:
             logger.error('%s', e)
