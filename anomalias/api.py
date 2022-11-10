@@ -151,7 +151,7 @@ def init(detectors):
 
     @api.get("/listAD")
     def list_ad():
-        return detectors.list_ad()
+        return set(detectors.list_ad())
 
     nest_asyncio.apply()
     cfg = uvicorn.Config(api, port=port, host="0.0.0.0", log_level="info")
