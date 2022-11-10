@@ -124,7 +124,9 @@ def init(detectors):
 
     @api.get("/removeAD")
     def remove_ad(df_id: str):
-        return detectors.remove(df_id=df_id)
+        res = detectors.remove(df_id=df_id)
+        logger.debug('\n %s', res)
+        return set(res)
 
     @api.post("/fit/{df_id}")
     def fit(df_id: str, data: DataFrame):
