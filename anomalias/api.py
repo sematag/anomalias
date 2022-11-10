@@ -122,6 +122,10 @@ def init(detectors):
     def start_ad(df_id: str):
         detectors.start(df_id=df_id)
 
+    @api.post("/removeAD")
+    def remove_ad(df_id: str):
+        detectors.remove(df_id=df_id)
+
     @api.post("/fit/{df_id}")
     def fit(df_id: str, data: DataFrame):
         df = pd.DataFrame(list(zip(data.values, data.metrics)),
