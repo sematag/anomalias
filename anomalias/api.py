@@ -122,7 +122,7 @@ def init(detectors):
     def start_ad(df_id: str):
         detectors.start(df_id=df_id)
 
-    @api.post("/removeAD")
+    @api.get("/removeAD")
     def remove_ad(df_id: str):
         detectors.remove(df_id=df_id)
 
