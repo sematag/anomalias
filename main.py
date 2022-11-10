@@ -4,7 +4,7 @@ import anomalias.api as api
 
 def main():
     detectors = Detectors()
-    api.start(detectors)
+    api.init(detectors)
 
 
 if __name__ == "__main__":

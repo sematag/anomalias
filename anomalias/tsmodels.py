@@ -29,6 +29,7 @@ class SsmAD:
     def fit(self, df):
         # Fit params
         self.__model_fit.apply(endog=df, refit=True)
+        self.__init = True
         logger.debug('%s', self.__model_fit.summary())
         logger.info('Model fitted. Params: %s', self.__model_fit.params)
 

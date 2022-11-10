@@ -80,7 +80,7 @@ class InfluxApi:
         self.__client.close()
 
 
-def start(detectors):
+def init(detectors):
     api = FastAPI()
 
     @api.post("/newTS")
@@ -149,5 +149,12 @@ def start(detectors):
         except Exception as e:
             logger.error('%s', e, exc_info=True)
 
+    @api.get("/listAD")
+    def list_ad():
+        return detectors.list_ad()
+
     nest_asyncio.apply()
-    uvicorn.run(api, port=port, host="0.0.0.0")
+    cfg = uvicorn.Config(api, port=port, host="0.0.0.0", log_level="info")
+    server = uvicorn.Server(cfg)
+    server.run()
+

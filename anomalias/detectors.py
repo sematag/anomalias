@@ -52,7 +52,7 @@ class Detectors:
             logger.error('%s', e)
             return None
 
-    def list_id(self):
+    def list_ad(self):
         return self.__df_id
 
     def start(self, df_id):
