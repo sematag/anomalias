@@ -48,9 +48,10 @@ class Detectors:
                 self.__dataframes[index].exit()
                 del self.__dataframes[index]
                 self.__df_id.remove(df_id)
+                return "OK"
         except Exception as e:
             logger.error('%s', e)
-            return None
+            return "ERROR"
 
     def list_ad(self):
         return self.__df_id
