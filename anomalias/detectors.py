@@ -11,8 +11,11 @@ class Detectors:
 
     def add(self, df_id, df_len, api):
         try:
-            self.__dataframes.append(dataframe.DataFrame(df_id=df_id, df_len=df_len, api=api))
-            self.__df_id.append(df_id)
+            if not self.__exist_id(df_id):
+                self.__dataframes.append(dataframe.DataFrame(df_id=df_id, df_len=df_len, api=api))
+                self.__df_id.append(df_id)
+            else:
+                logger.warning('Already exists a series with identity: %s', df_id)
         except Exception as e:
             logger.error('%s', e)
             raise
