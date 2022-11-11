@@ -129,7 +129,7 @@ def init(detectors):
         logger.debug('\n %s', res)
         return res
 
-    @api.post("/fit/{df_id}")
+    @api.post("/fit")
     def fit(df_id: str, data: DataFrame):
         df = pd.DataFrame(list(zip(data.values, data.metrics)),
                           columns=['values', 'metrics'], index=pd.to_datetime(data.index))
@@ -141,7 +141,7 @@ def init(detectors):
 
         detectors.fit(df_id, df)
 
-    @api.post("/detect/{df_id}")
+    @api.post("/detect")
     async def detect(df_id: str, data: DataFrame):
         try:
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
