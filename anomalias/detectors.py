@@ -98,7 +98,6 @@ class Detectors:
             if self.__df_id.__contains__(df_id):
                 return True
             else:
-                logger.warning('Time series not found, id: %s', df_id)
                 return False
         except Exception as e:
             logger.error('%s', e)
