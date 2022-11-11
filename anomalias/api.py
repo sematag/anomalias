@@ -86,7 +86,8 @@ def init(detectors):
     @api.post("/newTS")
     def new_ts(df_len: int, df_id: str):
         influx_api = InfluxApi()
-        detectors.add(df_len=df_len, df_id=df_id, api=influx_api)
+        res = detectors.add(df_len=df_len, df_id=df_id, api=influx_api)
+        return res
 
     @api.post("/setAD")
     def set_ad(df_id: str, model_id: str, data: DataModel):
@@ -126,7 +127,7 @@ def init(detectors):
     def remove_ad(df_id: str):
         res = detectors.remove(df_id=df_id)
         logger.debug('\n %s', res)
-        return set(res)
+        return res
 
     @api.post("/fit/{df_id}")
     def fit(df_id: str, data: DataFrame):
