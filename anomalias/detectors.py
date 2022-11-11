@@ -14,10 +14,13 @@ class Detectors:
             if not self.__exist_id(df_id):
                 self.__dataframes.append(dataframe.DataFrame(df_id=df_id, df_len=df_len, api=api))
                 self.__df_id.append(df_id)
+                return "OK"
             else:
                 logger.warning('Already exists a series with identity: %s', df_id)
+                return "ERROR"
         except Exception as e:
             logger.error('%s', e)
+            return "ERROR"
             raise
 
     def set_model(self, df_id, model):
