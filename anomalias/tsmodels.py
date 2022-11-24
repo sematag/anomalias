@@ -11,13 +11,20 @@ logger = log.logger('ssmad')
 
 
 class SsmAD:
-    def __init__(self, df, th_sigma, th_lower=None, th_upper=None, params=None, **kwargs):
+    def __init__(self, df, th_sigma, th_lower=None, th_upper=None, log=False, params=None, **kwargs):
         logger.info('Setting SARIMAX model.')
         self.__th_sigma = th_sigma
         self.__th_lower = th_lower
         self.__th_upper = th_upper
 
-        self.__model = SARIMAX(df, **kwargs)
+        if log:
+            self.__pre = lambda x: np.log1p(x)
+            self.__inv_pre = lambda x: np.exp(x) - 1
+        else:
+            self.__pre = lambda x: x
+            self.__inv_pre = lambda x: x
+
+        self.__model = SARIMAX(self.__pre(df), **kwargs)
         self.__init = True
 
         if params is None:
@@ -31,14 +38,14 @@ class SsmAD:
 
     def fit(self, df):
         # Fit params
-        self.__model_fit.apply(endog=df, refit=True)
+        self.__model_fit.apply(endog=self.__pre(df), refit=True)
         self.__init = True
         logger.debug('%s', self.__model_fit.summary())
         logger.info('Model fitted. Params: %s', self.__model_fit.params)
 
     def fit_detect(self, df):
         # Fit params
-        self.__model_fit.apply(endog=df, refit=True)
+        self.__model_fit.apply(endog=self.__pre(df), refit=True)
         logger.debug('%s', self.__model_fit.summary())
         logger.info('Model fitted. Params: %s', self.__model_fit.params)
 
@@ -52,14 +59,14 @@ class SsmAD:
 
     def detect(self, df):
         if self.__init:
-            self.__model_fit = self.__model_fit.apply(endog=df, refit=False)
+            self.__model_fit = self.__model_fit.apply(endog=self.__pre(df), refit=False)
             self.__init = False
         else:
             try:
-                self.__model_fit = self.__model_fit.extend(df)
+                self.__model_fit = self.__model_fit.extend(self.__pre(df))
             except ValueError as ve:
                 logger.debug('%s', ve)
-                self.__model_fit = self.__model_fit.apply(endog=df, refit=False)
+                self.__model_fit = self.__model_fit.apply(endog=self.__pre(df), refit=False)
 
         prediction = self.__model_fit.get_prediction()
 
@@ -79,10 +86,10 @@ class SsmAD:
         anomaly_th_lower = predicted_mean.values - self.__th_sigma * predicted_sigma.values
         anomaly_th_upper = predicted_mean.values + self.__th_sigma * predicted_sigma.values
 
-        anomaly_th_lower = pd.DataFrame(anomaly_th_lower,
-                                        columns=df.columns, index=df.index)
-        anomaly_th_upper = pd.DataFrame(anomaly_th_upper,
-                                        columns=df.columns, index=df.index)
+        anomaly_th_lower = self.__inv_pre(pd.DataFrame(anomaly_th_lower,
+                                                       columns=df.columns, index=df.index))
+        anomaly_th_upper = self.__inv_pre(pd.DataFrame(anomaly_th_upper,
+                                                       columns=df.columns, index=df.index))
 
         if self.__th_lower is not None:
             anomaly_th_lower.clip(lower=self.__th_lower, inplace=True)
@@ -91,8 +98,8 @@ class SsmAD:
 
         idx_anomaly = (df > anomaly_th_upper) | (df < anomaly_th_lower)
 
-        #idx_anomaly = pd.DataFrame(idx_anomaly,
-                                   #columns=df.columns, index=df.index)
+        # idx_anomaly = pd.DataFrame(idx_anomaly,
+        # columns=df.columns, index=df.index)
 
         return idx_anomaly, anomaly_th_lower, anomaly_th_upper
 
