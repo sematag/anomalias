@@ -11,13 +11,13 @@ logger = log.logger('ssmad')
 
 
 class SsmAD:
-    def __init__(self, df, th_sigma, th_lower=None, th_upper=None, log=False, params=None, **kwargs):
+    def __init__(self, df, th_sigma, th_lower=None, th_upper=None, pre_log=False, params=None, **kwargs):
         logger.info('Setting SARIMAX model.')
         self.__th_sigma = th_sigma
         self.__th_lower = th_lower
         self.__th_upper = th_upper
 
-        if log:
+        if pre_log:
             self.__pre = lambda x: np.log1p(x)
             self.__inv_pre = lambda x: np.exp(x) - 1
         else:
