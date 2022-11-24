@@ -11,9 +11,12 @@ logger = log.logger('ssmad')
 
 
 class SsmAD:
-    def __init__(self, df, th, params=None, **kwargs):
+    def __init__(self, df, th_sigma, th_lower=None, th_upper=None, params=None, **kwargs):
         logger.info('Setting SARIMAX model.')
-        self.__th = th
+        self.__th_sigma = th_sigma
+        self.__th_lower = th_lower
+        self.__th_upper = th_upper
+
         self.__model = SARIMAX(df, **kwargs)
         self.__init = True
 
@@ -73,15 +76,18 @@ class SsmAD:
             predicted_mean = predicted_mean.to_frame()
             predicted_sigma = predicted_sigma.to_frame()
 
-        anomaly_th_lower = predicted_mean.values - self.__th * predicted_sigma.values
-        anomaly_th_upper = predicted_mean.values + self.__th * predicted_sigma.values
+        anomaly_th_lower = predicted_mean.values - self.__th_sigma * predicted_sigma.values
+        anomaly_th_upper = predicted_mean.values + self.__th_sigma * predicted_sigma.values
 
         anomaly_th_lower = pd.DataFrame(anomaly_th_lower,
                                         columns=df.columns, index=df.index)
         anomaly_th_upper = pd.DataFrame(anomaly_th_upper,
                                         columns=df.columns, index=df.index)
 
-        anomaly_th_lower.clip(lower=0, inplace=True)
+        if self.__th_lower is not None:
+            anomaly_th_lower.clip(lower=self.__th_lower, inplace=True)
+        if self.__th_upper is not None:
+            anomaly_th_upper.clip(upper=self.__th_upper, inplace=True)
 
         idx_anomaly = (df > anomaly_th_upper) | (df < anomaly_th_lower)
 
@@ -90,8 +96,14 @@ class SsmAD:
 
         return idx_anomaly, anomaly_th_lower, anomaly_th_upper
 
-    def set_th(self, th):
-        self.__th = th
+    def set_th_sigma(self, th_sigma):
+        self.__th_sigma = th_sigma
+
+    def set_th_lower(self, th_lower):
+        self.__th_lower = th_lower
+
+    def set_th_upper(self, th_upper):
+        self.__th_upper = th_upper
 
 
 class ExpAD:
