@@ -146,7 +146,7 @@ def init(detectors):
         return res
 
     @api.post("/fit")
-    def fit(df_id: str, data: DataFrame):
+    async def fit(df_id: str, data: DataFrame):
         df = pd.DataFrame(list(zip(data.values, data.metrics)),
                           columns=['values', 'metrics'], index=pd.to_datetime(data.index))
         df = df.pivot(columns='metrics', values='values')
