@@ -53,6 +53,11 @@ class InfluxApi:
     def __init__(self):
         self.__client = InfluxDBClient(url=influx_url, token=token, org=org, timeout=timeout)
         self.__write_api = self.__client.write_api()
+        self.__delete_api = self.__client.delete_api()
+
+    def delete(self, measurement):
+        self.__delete_api.delete("1970-01-01T00:00:00Z", "9999-12-12T00:00:00Z",
+                                 '_measurement="' + measurement + '"',  bucket=bucket_train, org=org)
 
     def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper, train=False):
         if train:
@@ -153,6 +158,8 @@ def init(detectors):
 
         anomalies, anomaly_th_lower, anomaly_th_upper = detectors.fit(df_id, df)
         influx_api = InfluxApi()
+        for measurement in df:
+            influx_api.delete(measurement)
         influx_api.write(df, anomalies, anomaly_th_lower, anomaly_th_upper, train=True)
         influx_api.close()
 
