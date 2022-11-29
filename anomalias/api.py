@@ -116,7 +116,7 @@ def init(detectors):
             model = SsmAD(df=df,
                           th_sigma=data.threshold,
                           th_lower=data.th_lower,
-                          th_upper=th_upper,
+                          th_upper=data.th_upper,
                           order=data.order,
                           pre_log=data.pre_log
                           )
