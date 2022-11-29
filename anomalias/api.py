@@ -115,10 +115,10 @@ def init(detectors):
 
             model = SsmAD(df=df,
                           th_sigma=data.threshold,
-                          th_lower=data.params[0],
-                          th_upper=data.params[1],
-                          order=data.params[2],
-                          pre_log=data.params[3]
+                          th_lower=data.th_lower,
+                          th_upper=th_upper,
+                          order=data.order,
+                          pre_log=data.pre_log
                           )
             detectors.set_model(df_id, model)
 
