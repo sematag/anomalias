@@ -158,9 +158,10 @@ def init(detectors):
         anomalies, anomaly_th_lower, anomaly_th_upper = detectors.fit(df_id, df)
         influx_api = InfluxApi()
         for measurement in df:
-            influx_api.delete("callCost")
+            influx_api.delete(measurement)
         influx_api.write(df, anomalies, anomaly_th_lower, anomaly_th_upper, train=True)
         influx_api.close()
+        return "OK"
 
     @api.post("/detect")
     async def detect(df_id: str, data: DataFrame):
