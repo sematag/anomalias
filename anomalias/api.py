@@ -56,9 +56,9 @@ class InfluxApi:
 
     def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper, train=False):
         if train:
-            bk = bucket
+            bk = str(bucket)
         else:
-            bk = bucket_train
+            bk = str(bucket_train)
 
         if not df.empty:
             for metric in df:
