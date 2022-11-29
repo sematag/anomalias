@@ -56,9 +56,9 @@ class InfluxApi:
 
     def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper, train=False):
         if train:
-            bk = str(bucket)
-        else:
             bk = str(bucket_train)
+        else:
+            bk = str(bucket)
 
         if not df.empty:
             for metric in df:
@@ -68,6 +68,9 @@ class InfluxApi:
                 logger.debug('api.py: anomalies to write (metric %s):', metric)
                 logger.debug('\n %s', df_out)
                 logger.debug('\n %s', anomalies_out)
+
+                logger.debug('\n %s', bk)
+
                 self.__write_api.write(bk, org, record=df_out, data_frame_measurement_name=metric,
                                        data_frame_tag_columns=None)
                 self.__write_api.write(bk, org, record=anomalies_out, data_frame_measurement_name=metric,
