@@ -11,7 +11,7 @@ logger = log.logger('ssmad')
 
 
 class SsmAD:
-    def __init__(self, df, th_sigma, th_lower=None, th_upper=None, pre_log=False, params=None, **kwargs):
+    def __init__(self, df, th_sigma, th_lower=None, th_upper=None, pre_log=False, **kwargs):
         logger.info('Setting SARIMAX model.')
         self.__th_sigma = th_sigma
         self.__th_lower = th_lower
@@ -26,36 +26,21 @@ class SsmAD:
 
         self.__model = SARIMAX(self.__pre(df), **kwargs)
         self.__init = True
-
-        if params is None:
-            self.__model_fit = self.__model.fit()
-            logger.debug('%s', self.__model_fit.summary())
-        else:
-            self.__model.update(params=params)
-            self.__model_fit = self.__model.filter()
+        self.__trained = False
+        self.__model_fit = None
 
         # logger.debug('%s', self.__model_fit.fittedvalues)
 
     def fit(self, df):
         # Fit params
-        self.__model_fit.apply(endog=self.__pre(df), refit=True)
+        if not self.__trained:
+            self.__model_fit = self.__model.fit()
+            self.__trained = True
+        else:
+            self.__model_fit.apply(endog=self.__pre(df), refit=True)
         self.__init = True
         logger.debug('%s', self.__model_fit.summary())
         logger.info('Model fitted. Params: %s', self.__model_fit.params)
-
-    def fit_detect(self, df):
-        # Fit params
-        self.__model_fit.apply(endog=self.__pre(df), refit=True)
-        logger.debug('%s', self.__model_fit.summary())
-        logger.info('Model fitted. Params: %s', self.__model_fit.params)
-
-        pred = self.__model_fit.get_prediction()
-
-        prediction_error = df - pred.predicted_mean
-        sigma = np.sqrt(pred.var_pred_mean)
-        idx_anom = np.abs(prediction_error) > self.__th * sigma
-
-        return idx_anom
 
     def detect(self, df):
         if self.__init:
