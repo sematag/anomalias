@@ -42,7 +42,11 @@ class Detector:
     def fit(self, df):
         with self.__available:
             self.__model.fit(df)
+            anomalies, anomaly_th_lower, anomaly_th_upper = self.__model.detect(df)
+            anomalies = anomalies.astype('boolean')
             self.__available.notify()
+
+            return anomalies, anomaly_th_lower, anomaly_th_upper
 
     def detect(self, observations):
         with self.__available:

@@ -22,6 +22,7 @@ config.read("config.ini")
 token = config.get("influx", "token")
 org = config.get("influx", "org")
 bucket = config.get("influx", "bucket")
+bucket_train = config.get("influx", "bucket_train")
 influx_url = config.get("influx", "influx_url")
 timeout = config.get("influx", "timeout")
 port = int(config.get("influx", "port"))
@@ -53,7 +54,12 @@ class InfluxApi:
         self.__client = InfluxDBClient(url=influx_url, token=token, org=org, timeout=timeout)
         self.__write_api = self.__client.write_api()
 
-    def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper):
+    def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper, train=False):
+        if train:
+            bk = bucket
+        else:
+            bk = bucket_train
+
         if not df.empty:
             for metric in df:
                 df_out = df[metric].to_frame()
@@ -62,9 +68,9 @@ class InfluxApi:
                 logger.debug('api.py: anomalies to write (metric %s):', metric)
                 logger.debug('\n %s', df_out)
                 logger.debug('\n %s', anomalies_out)
-                self.__write_api.write(bucket, org, record=df_out, data_frame_measurement_name=metric,
+                self.__write_api.write(bk, org, record=df_out, data_frame_measurement_name=metric,
                                        data_frame_tag_columns=None)
-                self.__write_api.write(bucket, org, record=anomalies_out, data_frame_measurement_name=metric,
+                self.__write_api.write(bk, org, record=anomalies_out, data_frame_measurement_name=metric,
                                        data_frame_tag_columns=None)
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
                     anomaly_th_lower_out = anomaly_th_lower[metric].to_frame()
@@ -72,9 +78,9 @@ class InfluxApi:
                     anomaly_th_upper_out = anomaly_th_upper[metric].to_frame()
                     anomaly_th_upper_out = anomaly_th_upper_out.rename(columns={metric: 'anomalyThU'})
 
-                    self.__write_api.write(bucket, org, record=anomaly_th_lower_out, data_frame_measurement_name=metric,
+                    self.__write_api.write(bk, org, record=anomaly_th_lower_out, data_frame_measurement_name=metric,
                                            data_frame_tag_columns=None)
-                    self.__write_api.write(bucket, org, record=anomaly_th_upper_out, data_frame_measurement_name=metric,
+                    self.__write_api.write(bk, org, record=anomaly_th_upper_out, data_frame_measurement_name=metric,
                                            data_frame_tag_columns=None)
 
     def close(self):
@@ -142,7 +148,10 @@ def init(detectors):
         logger.debug('api.py: call to fit(), data:')
         logger.debug('\n %s', df)
 
-        detectors.fit(df_id, df)
+        anomalies, anomaly_th_lower, anomaly_th_upper = detectors.fit(df_id, df)
+        influx_api = InfluxApi()
+        influx_api.write(df, anomalies, anomaly_th_lower, anomaly_th_upper, train=True)
+        influx_api.close()
 
     @api.post("/detect")
     async def detect(df_id: str, data: DataFrame):

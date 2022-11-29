@@ -78,7 +78,10 @@ class Detectors:
 
     def fit(self, df_id, df):
         if self.__exist_id(df_id):
-            self.__dataframes[self.__df_id.index(df_id)].ad.fit(df)
+            anomalies, anomaly_th_lower, anomaly_th_upper = self.__dataframes[self.__df_id.index(df_id)].ad.fit(df)
+            return anomalies, anomaly_th_lower, anomaly_th_upper
+        else:
+            return None, None, None
 
     def get_detection(self, df_id):
         try:
