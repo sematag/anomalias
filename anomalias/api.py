@@ -41,10 +41,11 @@ class DataModel(BaseModel):
     values: list
     metrics: List[str]
     freq: str
-    threshold: float = None
-    model_type: str = None
-    order: list = None
-    params: list = None
+    threshold: float
+    order: list
+    th_lower: float = None
+    th_upper: float = None
+    pre_log: bool = False
 
 
 class InfluxApi:
@@ -113,10 +114,12 @@ def init(detectors):
             df = df.asfreq(data.freq)
 
             model = SsmAD(df=df,
-                          th=data.threshold,
-                          model_type=data.model_type,
-                          params=data.params,
-                          order=data.order)
+                          th_sigma=data.threshold,
+                          th_lower=data.params[0],
+                          th_upper=data.params[1],
+                          order=data.params[2],
+                          pre_log=data.params[3]
+                          )
             detectors.set_model(df_id, model)
 
     @api.post("/startAD")
