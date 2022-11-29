@@ -56,7 +56,7 @@ class InfluxApi:
         self.__delete_api = self.__client.delete_api()
 
     def delete(self, measurement):
-        self.__delete_api.delete("1970-01-01T00:00:00Z", "9999-12-12T00:00:00Z", '_measurement="' + measurement + '"',  bucket=bucket_train, org=org)
+        self.__delete_api.delete("1970-01-01T00:00:00Z", "2023-12-12T00:00:00Z", '_measurement="' + measurement + '"',  bucket=bucket_train, org=org)
 
     def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper, train=False):
         if train:
