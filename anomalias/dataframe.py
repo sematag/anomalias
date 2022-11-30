@@ -35,7 +35,7 @@ class DataFrame(Thread):
                 logger.debug('Anomalies:')
                 logger.debug('\n %s', anomalies)
 
-                self.__api.write(df, anomalies, anomaly_th_lower, anomaly_th_upper)
+                self.__api.write(df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement=self.id)
 
     def append(self, obs):
         self.__observations.put(obs)

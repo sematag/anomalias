@@ -56,9 +56,9 @@ class InfluxApi:
         self.__delete_api = self.__client.delete_api()
 
     def delete(self, measurement):
-        self.__delete_api.delete("1970-01-01T00:00:00Z", "2023-12-12T00:00:00Z", '_measurement="' + measurement + '"',  bucket=bucket_train, org=org)
+        self.__delete_api.delete("1970-01-01T00:00:00Z", "2073-12-12T00:00:00Z", '_measurement="' + measurement + '"',  bucket=bucket_train, org=org)
 
-    def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper, train=False):
+    def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement, train=False):
         if train:
             bk = str(bucket_train)
         else:
@@ -75,9 +75,9 @@ class InfluxApi:
 
                 logger.debug('\n %s', bk)
 
-                self.__write_api.write(bk, org, record=df_out, data_frame_measurement_name=metric,
+                self.__write_api.write(bk, org, record=df_out, data_frame_measurement_name=measurement,
                                        data_frame_tag_columns=None)
-                self.__write_api.write(bk, org, record=anomalies_out, data_frame_measurement_name=metric,
+                self.__write_api.write(bk, org, record=anomalies_out, data_frame_measurement_name=measurement,
                                        data_frame_tag_columns=None)
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
                     anomaly_th_lower_out = anomaly_th_lower[metric].to_frame()
@@ -85,9 +85,9 @@ class InfluxApi:
                     anomaly_th_upper_out = anomaly_th_upper[metric].to_frame()
                     anomaly_th_upper_out = anomaly_th_upper_out.rename(columns={metric: 'anomalyThU'})
 
-                    self.__write_api.write(bk, org, record=anomaly_th_lower_out, data_frame_measurement_name=metric,
+                    self.__write_api.write(bk, org, record=anomaly_th_lower_out, data_frame_measurement_name=measurement,
                                            data_frame_tag_columns=None)
-                    self.__write_api.write(bk, org, record=anomaly_th_upper_out, data_frame_measurement_name=metric,
+                    self.__write_api.write(bk, org, record=anomaly_th_upper_out, data_frame_measurement_name=measurement,
                                            data_frame_tag_columns=None)
 
     def close(self):
@@ -159,7 +159,7 @@ def init(detectors):
         influx_api = InfluxApi()
         for measurement in df:
             influx_api.delete(measurement)
-        influx_api.write(df, anomalies, anomaly_th_lower, anomaly_th_upper, train=True)
+        influx_api.write(df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement=df_id, train=True)
         influx_api.close()
         return "OK"
 
