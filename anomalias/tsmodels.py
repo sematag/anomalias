@@ -463,8 +463,8 @@ class DCVAE:
 
 
                
-    def predict(self, load_model=False,
-                df_X=None, 
+    def detect(self, df_X=None, 
+                load_model=False, 
                 only_predict=True,
                 load_alpha=True,
                 alpha_set_up=[],
