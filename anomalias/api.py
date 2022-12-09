@@ -142,6 +142,9 @@ def init(detectors):
     @api.get("/removeAD")
     def remove_ad(df_id: str):
         res = detectors.remove(df_id=df_id)
+        influx_api = InfluxApi()
+        influx_api.delete(df_id)
+        influx_api.close()
         logger.debug('\n %s', res)
         return res
 
