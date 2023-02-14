@@ -211,23 +211,25 @@ def init(detectors):
     def list_ad():
         return set(detectors.list_ad())
 
+
+
+    # Read system state
     with open('state/state.ini') as file:
         metrics = [line.rstrip('\n') for line in file]
         file.close()
+    if metrics:
+        for metric in metrics:
+            with open('state/' + metric + '.model') as file:
+                model = file.read()
+                file.close()
 
-    # Read system state
-    for metric in metrics:
-        with open('state/' + metric + '.model') as file:
-            model = file.read()
-            file.close()
+            dat_model = pd.read_pickle(r'state/' + metric + '.DataModel')
+            dat_frame = pd.read_pickle(r'state/' + metric + '.Dataframe')
 
-        dat_model = pd.read_pickle(r'state/' + metric + '.DataModel')
-        dat_frame = pd.read_pickle(r'state/' + metric + '.Dataframe')
-
-        new_ts(15, metric)
-        set_ad(metric, model, dat_model)
-        fit(metric, dat_frame)
-        start_ad(metric)
+            new_ts(15, metric)
+            set_ad(metric, model, dat_model)
+            fit(metric, dat_frame)
+            start_ad(metric)
 
     nest_asyncio.apply()
     cfg = uvicorn.Config(api, port=port, host="0.0.0.0", log_level="info")
