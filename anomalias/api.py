@@ -139,9 +139,11 @@ def init(detectors):
                           )
             detectors.set_model(df_id, model)
 
-            file_name = df_id+'.DataModel'
-            with open('state/'+file_name, 'wb') as file:
-                pd.to_pickle(DataModel, file)
+        with open('state/' + df_id + '.model') as file:
+            file.write(model_id)
+
+        with open('state/'+df_id+'.DataModel', 'wb') as file:
+            pd.to_pickle(DataModel, file)
 
     @api.post("/startAD")
     def start_ad(df_id: str):
