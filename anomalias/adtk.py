@@ -2,6 +2,7 @@ from adtk.detector import SeasonalAD
 from adtk.detector import MinClusterDetector
 from sklearn.cluster import KMeans
 from anomalias import log
+import pandas as pd
 
 logger = log.logger('adtk')
 
@@ -26,6 +27,11 @@ class AdtkAD:
 
     def detect(self, observations):
         idx_anomaly = self.__model.detect(observations)
+
+        if isinstance(idx_anomaly, pd.Series):
+            idx_anomaly = idx_anomaly.to_frame()
+            idx_anomaly.columns = observations.columns
+
         anomaly_th_lower = None
         anomaly_th_upper = None
 
