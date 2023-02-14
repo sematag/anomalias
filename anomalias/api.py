@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import anomalias.log as log
 
 import pandas as pd
+import os
 
 from influxdb_client import InfluxDBClient
 
@@ -102,7 +103,7 @@ def init(detectors):
     def new_ts(df_len: int, df_id: str):
         influx_api = InfluxApi()
         res = detectors.add(df_len=df_len, df_id=df_id, api=influx_api)
-        with open('state.ini', 'w') as file:
+        with open('state/state.ini', 'w') as file:
             file.write('\n'.join(detectors.list_ad()))
         return res
 
@@ -138,6 +139,10 @@ def init(detectors):
                           )
             detectors.set_model(df_id, model)
 
+            file_name = df_id+'.DataModel'
+            with open('state/'+file_name, 'wb') as file:
+                pd.to_pickle(DataModel, file)
+
     @api.post("/startAD")
     def start_ad(df_id: str):
         detectors.start(df_id=df_id)
@@ -149,8 +154,13 @@ def init(detectors):
         influx_api.delete(df_id)
         influx_api.close()
         logger.debug('\n %s', res)
-        with open('state.ini', 'w') as file:
+
+        with open('state/state.ini', 'w') as file:
             file.write('\n'.join(detectors.list_ad()))
+
+        os.remove('state/'+df_id+'.DataModel')
+        os.remove('state/'+df_id+'.DataFrame')
+
         return res
 
     @api.post("/fit")
@@ -168,6 +178,11 @@ def init(detectors):
         influx_api.delete(df_id)
         influx_api.write(df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement=df_id, train=True)
         influx_api.close()
+
+        file_name = df_id + '.DataFrame'
+        with open('state/' + file_name, 'wb') as file:
+            pd.to_pickle(DataFrame, file)
+
         return "OK"
 
     @api.post("/detect")
@@ -188,6 +203,15 @@ def init(detectors):
     @api.get("/listAD")
     def list_ad():
         return set(detectors.list_ad())
+
+    with open('state.ini') as f:
+        metrics = [line.rstrip('\n') for line in f]
+
+    #for metric in metrics:
+    #    new_ts(15, metric)
+    #    set_ad(metric, datModel)
+    #    fit(metric,datFrame)
+    #    start_ad(metric)
 
     nest_asyncio.apply()
     cfg = uvicorn.Config(api, port=port, host="0.0.0.0", log_level="info")
