@@ -204,8 +204,8 @@ def init(detectors):
     def list_ad():
         return set(detectors.list_ad())
 
-    with open('state.ini') as f:
-        metrics = [line.rstrip('\n') for line in f]
+    #with open('state.ini') as f:
+    #    metrics = [line.rstrip('\n') for line in f]
 
     #for metric in metrics:
     #    new_ts(15, metric)
