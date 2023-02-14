@@ -102,6 +102,8 @@ def init(detectors):
     def new_ts(df_len: int, df_id: str):
         influx_api = InfluxApi()
         res = detectors.add(df_len=df_len, df_id=df_id, api=influx_api)
+        with open('state.ini', 'w') as file:
+            file.write('\n'.join(detectors.list_ad()))
         return res
 
     @api.post("/setAD")
@@ -147,6 +149,8 @@ def init(detectors):
         influx_api.delete(df_id)
         influx_api.close()
         logger.debug('\n %s', res)
+        with open('state.ini', 'w') as file:
+            file.write('\n'.join(detectors.list_ad()))
         return res
 
     @api.post("/fit")
