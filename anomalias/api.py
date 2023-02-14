@@ -224,7 +224,7 @@ def init(detectors):
                 file.close()
 
             dat_model = pd.read_pickle(r'state/' + metric + '.DataModel')
-            dat_frame = pd.read_pickle(r'state/' + metric + '.Dataframe')
+            dat_frame = pd.read_pickle(r'state/' + metric + '.DataFrame')
 
             new_ts(15, metric)
             set_ad(metric, model, dat_model)
