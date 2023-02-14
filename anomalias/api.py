@@ -211,9 +211,9 @@ def init(detectors):
     def list_ad():
         return set(detectors.list_ad())
 
-    with open('state.ini') as f:
-        metrics = [line.rstrip('\n') for line in f]
-        f.close()
+    with open('state/state.ini') as file:
+        metrics = [line.rstrip('\n') for line in file]
+        file.close()
 
     # Read system state
     for metric in metrics:
