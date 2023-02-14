@@ -103,6 +103,7 @@ def init(detectors):
     def new_ts(df_len: int, df_id: str):
         influx_api = InfluxApi()
         res = detectors.add(df_len=df_len, df_id=df_id, api=influx_api)
+
         with open('state/state.ini', 'w') as file:
             file.write('\n'.join(detectors.list_ad()))
         return res
@@ -141,9 +142,11 @@ def init(detectors):
 
         with open('state/' + df_id + '.model', 'w+') as file:
             file.write(model_id)
+            file.close()
 
         with open('state/'+df_id+'.DataModel', 'wb') as file:
             pd.to_pickle(DataModel, file)
+            file.close()
 
     @api.post("/startAD")
     def start_ad(df_id: str):
@@ -159,9 +162,11 @@ def init(detectors):
 
         with open('state/state.ini', 'w') as file:
             file.write('\n'.join(detectors.list_ad()))
+            file.close()
 
-        os.remove('state/'+df_id+'.DataModel')
-        os.remove('state/'+df_id+'.DataFrame')
+        os.remove('state/' + df_id + '.DataModel')
+        os.remove('state/' + df_id + '.DataFrame')
+        os.remove('state/' + df_id + '.model')
 
         return res
 
@@ -181,9 +186,9 @@ def init(detectors):
         influx_api.write(df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement=df_id, train=True)
         influx_api.close()
 
-        file_name = df_id + '.DataFrame'
-        with open('state/' + file_name, 'wb') as file:
+        with open('state/' + df_id + '.DataFrame', 'wb') as file:
             pd.to_pickle(DataFrame, file)
+            file.close()
 
         return "OK"
 
@@ -206,14 +211,23 @@ def init(detectors):
     def list_ad():
         return set(detectors.list_ad())
 
-    #with open('state.ini') as f:
-    #    metrics = [line.rstrip('\n') for line in f]
+    with open('state.ini') as f:
+        metrics = [line.rstrip('\n') for line in f]
+        f.close()
 
-    #for metric in metrics:
-    #    new_ts(15, metric)
-    #    set_ad(metric, datModel)
-    #    fit(metric,datFrame)
-    #    start_ad(metric)
+    # Read system state
+    for metric in metrics:
+        with open('state/' + metric + '.model') as file:
+            model = file.read()
+            file.close()
+
+        dat_model = pd.read_pickle(r'state/' + metric + '.DataModel')
+        dat_frame = pd.read_pickle(r'state/' + metric + '.Dataframe')
+
+        new_ts(15, metric)
+        set_ad(metric, model, dat_model)
+        fit(metric, dat_frame)
+        start_ad(metric)
 
     nest_asyncio.apply()
     cfg = uvicorn.Config(api, port=port, host="0.0.0.0", log_level="info")
