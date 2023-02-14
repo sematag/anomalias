@@ -42,8 +42,8 @@ class DataModel(BaseModel):
     values: list
     metrics: List[str]
     freq: str
-    threshold: float
-    order: list
+    threshold: float = 4
+    order: list = (1, 1, 2)
     th_lower: float = None
     th_upper: float = None
     pre_log: bool = False
