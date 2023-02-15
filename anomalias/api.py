@@ -3,6 +3,7 @@ import anomalias.log as log
 
 import pandas as pd
 import os
+import pickle
 
 from influxdb_client import InfluxDBClient
 
@@ -145,7 +146,7 @@ def init(detectors):
             file.close()
 
         with open('state/'+df_id+'_DataModel.pkl', 'wb') as file:
-            pd.to_pickle(DataModel, file)
+            pickle.dump(DataModel, file)
             file.close()
 
     @api.post("/startAD")
@@ -187,7 +188,7 @@ def init(detectors):
         influx_api.close()
 
         with open('state/' + df_id + '_DataFrame.pkl', 'wb') as file:
-            pd.to_pickle(DataFrame, file)
+            pickle.dump(DataFrame, file)
             file.close()
 
         return "OK"
@@ -221,8 +222,13 @@ def init(detectors):
                 model = file.read()
                 file.close()
 
-            dat_model = pd.read_pickle(r'state/' + metric + '_DataModel.pkl')
-            dat_frame = pd.read_pickle(r'state/' + metric + '_DataFrame.pkl')
+            with open('state/' + metric + '_DataModel.pkl', 'rb') as file:
+                dat_model = pickle.load(file)
+                file.close()
+
+            with open('state/' + metric + '_DataFrame.pkl', 'rb') as file:
+                dat_frame = pickle.load(file)
+                file.close()
 
             new_ts(15, metric)
             set_ad(metric, model, dat_model)
