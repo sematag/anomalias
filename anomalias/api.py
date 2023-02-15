@@ -144,7 +144,7 @@ def init(detectors):
             file.write(model_id)
             file.close()
 
-        with open('state/'+df_id+'.DataModel', 'wb') as file:
+        with open('state/'+df_id+'_DataModel.pkl', 'wb') as file:
             pd.to_pickle(DataModel, file)
             file.close()
 
@@ -186,7 +186,7 @@ def init(detectors):
         influx_api.write(df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement=df_id, train=True)
         influx_api.close()
 
-        with open('state/' + df_id + '.DataFrame', 'wb') as file:
+        with open('state/' + df_id + '_DataFrame.pkl', 'wb') as file:
             pd.to_pickle(DataFrame, file)
             file.close()
 
@@ -211,8 +211,6 @@ def init(detectors):
     def list_ad():
         return set(detectors.list_ad())
 
-
-
     # Read system state
     with open('state/state.ini') as file:
         metrics = [line.rstrip('\n') for line in file]
@@ -223,8 +221,8 @@ def init(detectors):
                 model = file.read()
                 file.close()
 
-            dat_model = pd.read_pickle(r'state/' + metric + '.DataModel')
-            dat_frame = pd.read_pickle(r'state/' + metric + '.DataFrame')
+            dat_model = pd.read_pickle(r'state/' + metric + '_DataModel.pkl')
+            dat_frame = pd.read_pickle(r'state/' + metric + '_DataFrame.pkl')
 
             new_ts(15, metric)
             set_ad(metric, model, dat_model)
