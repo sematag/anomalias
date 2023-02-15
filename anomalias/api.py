@@ -8,10 +8,8 @@ import pickle
 from influxdb_client import InfluxDBClient
 
 from pydantic import BaseModel
-# from pydantic.generics import GenericModel, GenericModelT
 
 from typing import List
-# from typing import List, TypeVar, Generic, Type, Union, Any, Tuple
 
 import nest_asyncio
 import uvicorn
@@ -53,18 +51,6 @@ class DataModel(BaseModel):
     th_lower: float = None
     th_upper: float = None
     pre_log: bool = False
-
-
-#T = TypeVar('T')
-
-
-#class GenericClass(GenericModel, Generic[T]):
-#    value: T
-#
-#    def __class_getitem__(cls: Type[GenericModelT], params: Union[Type[Any], Tuple[Type[Any], ...]]) -> Type[Any]:
-#        created_class = super().__class_getitem__(params)
-#        setattr(sys.modules[created_class.__module__], created_class.__name__, created_class)
-#        return created_class
 
 
 class InfluxApi:
@@ -188,7 +174,7 @@ def init(detectors):
         return res
 
     @api.post("/fit")
-    async def fit(df_id: str, data: DataFrame):
+    def fit(df_id: str, data: DataFrame):
         df = pd.DataFrame(list(zip(data.values, data.metrics)),
                           columns=['values', 'metrics'], index=pd.to_datetime(data.index))
         df = df.pivot(columns='metrics', values='values')
@@ -210,7 +196,7 @@ def init(detectors):
         return "OK"
 
     @api.post("/detect")
-    async def detect(df_id: str, data: DataFrame):
+    def detect(df_id: str, data: DataFrame):
         try:
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
                               columns=['values', 'metrics'], index=pd.to_datetime(data.index))
