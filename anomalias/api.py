@@ -8,7 +8,11 @@ import pickle
 from influxdb_client import InfluxDBClient
 
 from pydantic import BaseModel
+# from pydantic.generics import GenericModel, GenericModelT
+
 from typing import List
+# from typing import List, TypeVar, Generic, Type, Union, Any, Tuple
+
 import nest_asyncio
 import uvicorn
 import configparser
@@ -49,6 +53,18 @@ class DataModel(BaseModel):
     th_lower: float = None
     th_upper: float = None
     pre_log: bool = False
+
+
+#T = TypeVar('T')
+
+
+#class GenericClass(GenericModel, Generic[T]):
+#    value: T
+#
+#    def __class_getitem__(cls: Type[GenericModelT], params: Union[Type[Any], Tuple[Type[Any], ...]]) -> Type[Any]:
+#        created_class = super().__class_getitem__(params)
+#        setattr(sys.modules[created_class.__module__], created_class.__name__, created_class)
+#        return created_class
 
 
 class InfluxApi:
@@ -146,7 +162,7 @@ def init(detectors):
             file.close()
 
         with open('state/'+df_id+'_DataModel.pkl', 'wb') as file:
-            pickle.dump(DataModel, file)
+            pickle.dump(data, file)
             file.close()
 
     @api.post("/startAD")
@@ -188,7 +204,7 @@ def init(detectors):
         influx_api.close()
 
         with open('state/' + df_id + '_DataFrame.pkl', 'wb') as file:
-            pickle.dump(DataFrame, file)
+            pickle.dump(data, file)
             file.close()
 
         return "OK"
@@ -239,7 +255,6 @@ def init(detectors):
             logger.debug('fit')
             start_ad(metric)
             logger.debug('statr_ad')
-
 
     nest_asyncio.apply()
     cfg = uvicorn.Config(api, port=port, host="0.0.0.0", log_level="info")
