@@ -234,13 +234,9 @@ def init(detectors):
                 file.close()
 
             new_ts(15, metric)
-            logger.debug('new_ts')
             set_ad(metric, model, dat_model)
-            logger.debug('set_ad')
             fit(metric, dat_frame)
-            logger.debug('fit')
             start_ad(metric)
-            logger.debug('statr_ad')
 
     nest_asyncio.apply()
     cfg = uvicorn.Config(api, port=port, host="0.0.0.0", log_level="info")
