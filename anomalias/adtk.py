@@ -153,11 +153,14 @@ class AdtkAD:
         idx_anomaly['anomaly'] = idx_anomaly['nvot'] >= self.__nvot
 
         idx_anomaly = idx_anomaly[idx_anomaly['anomaly'] == 1].astype(bool)
+        idx_anomaly = idx_anomaly['anomaly']
         idx_anomaly = idx_anomaly.reset_index().set_index('_time')
 
         idx_anomaly.index.rename(observations.index.name, inplace=True)
 
+        idx_anomaly = idx_anomaly.pivot(columns='series', values='anomaly')
+
         anomaly_th_lower = None
         anomaly_th_upper = None
 
-        return idx_anomaly['anomaly'], anomaly_th_lower, anomaly_th_upper
+        return idx_anomaly, anomaly_th_lower, anomaly_th_upper
