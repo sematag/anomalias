@@ -126,7 +126,6 @@ class AdtkAD:
     def detect(self, observations):
 
         for i, detector in enumerate(self.__model):
-            print(i)
             anom = detector(param=params[i]).fit_detect(observations)
             anom.index.rename('_time', inplace=True)
 
