@@ -76,7 +76,7 @@ class InfluxApi:
 
                 anomalies_out = anomalies[metric]
                 anomalies_out = anomalies[anomalies_out].rename(columns={metric: 'anomaly'}).astype(int)
-                logger.debug('api.py: anomalies to write (metric %s):', metric)
+                logger.debug('api.py: anomalies to write (measurement %s):', measurement)
                 logger.debug('\n %s', df_out)
                 logger.debug('\n %s', anomalies_out)
 
