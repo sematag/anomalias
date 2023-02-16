@@ -51,6 +51,9 @@ class DataModel(BaseModel):
     th_lower: float = None
     th_upper: float = None
     pre_log: bool = False
+    adtk_id: list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+    nvot: int = 1
+
 
 
 class InfluxApi:
@@ -116,8 +119,8 @@ def init(detectors):
     @api.post("/setAD")
     def set_ad(df_id: str, model_id: str, data: DataModel):
         try:
-            if model_id == 'MinClusterAD':
-                model = AdtkAD(model_id, n_clusters=2)
+            if model_id == 'AdtkAD':
+                model = AdtkAD(data.adtk_id, data.nvot)
                 detectors.set_model(df_id, model)
             elif model_id == 'ExpAD':
                 df = pd.DataFrame(list(zip(data.values, data.metrics)),
