@@ -160,4 +160,4 @@ class AdtkAD:
         anomaly_th_lower = None
         anomaly_th_upper = None
 
-        return idx_anomaly, anomaly_th_lower, anomaly_th_upper
+        return idx_anomaly['anomaly'], anomaly_th_lower, anomaly_th_upper
