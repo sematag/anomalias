@@ -114,19 +114,19 @@ class AdtkAD:
     def __init__(self, models_idx, nvot=1, **kargs):
         self.__df_train = []
         logger.info('Creating ADTK model.')
-        self.__model = [detector_lst[i] for i in models_idx]
+        self.__model = [detector_lst[i](params[i]) for i in models_idx]
         self.__nvot = nvot
-        self.__params = [params[i] for i in models_idx]
 
     def fit(self, train_data):
         logger.info('Fitting model.')
-        # self.__df_train = train_data
-        # self.__model.fit(train_data)
+        self.__df_train = train_data
+        for i, detector in enumerate(self.__model):
+            self.__model[i].fit(train_data)
 
     def detect(self, observations):
 
         for i, detector in enumerate(self.__model):
-            anom = detector(param=params[i]).fit_detect(observations)
+            anom = self.__model[i].detect(observations)
             anom.index.rename('_time', inplace=True)
 
             if isinstance(anom, pd.Series):
