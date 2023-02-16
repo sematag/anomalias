@@ -167,8 +167,8 @@ def init(detectors):
             file.write('\n'.join(detectors.list_ad()))
             file.close()
 
-        os.remove('state/' + df_id + '.DataModel')
-        os.remove('state/' + df_id + '.DataFrame')
+        os.remove('state/' + df_id + '_DataModel.pkl')
+        os.remove('state/' + df_id + '_DataFrame.pkl')
         os.remove('state/' + df_id + '.model')
 
         return res
