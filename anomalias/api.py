@@ -104,99 +104,121 @@ def init(detectors):
 
     @api.post("/newTS")
     def new_ts(df_len: int, df_id: str):
-        influx_api = InfluxApi()
-        res = detectors.add(df_len=df_len, df_id=df_id, api=influx_api)
+        try:
+            influx_api = InfluxApi()
+            res = detectors.add(df_len=df_len, df_id=df_id, api=influx_api)
 
-        with open('state/state.ini', 'w') as file:
-            file.write('\n'.join(detectors.list_ad()))
-        return res
+            return res
+        except Exception as e:
+            logger.error('%s', e, exc_info=True)
+            return "ERROR"
 
     @api.post("/setAD")
     def set_ad(df_id: str, model_id: str, data: DataModel):
-        if model_id == 'MinClusterAD':
-            model = AdtkAD(model_id, n_clusters=2)
-            detectors.set_model(df_id, model)
-        elif model_id == 'ExpAD':
-            df = pd.DataFrame(list(zip(data.values, data.metrics)),
-                              columns=['values', 'metrics'], index=pd.to_datetime(data.index))
-            df = df.pivot(columns='metrics', values='values')
-            df = df.asfreq(data.freq)
+        try:
+            if model_id == 'MinClusterAD':
+                model = AdtkAD(model_id, n_clusters=2)
+                detectors.set_model(df_id, model)
+            elif model_id == 'ExpAD':
+                df = pd.DataFrame(list(zip(data.values, data.metrics)),
+                                  columns=['values', 'metrics'], index=pd.to_datetime(data.index))
+                df = df.pivot(columns='metrics', values='values')
+                df = df.asfreq(data.freq)
 
-            model = ExpAD(th=1,
-                          df=df,
-                          model_type="Exp",
-                          seasonal=12,
-                          initialization_method='concentrated')
-            detectors.set_model(df_id, model)
-        elif model_id == 'SsmAD':
-            df = pd.DataFrame(list(zip(data.values, data.metrics)),
-                              columns=['values', 'metrics'], index=pd.to_datetime(data.index))
-            df = df.pivot(columns='metrics', values='values')
-            df = df.asfreq(data.freq)
+                model = ExpAD(th=1,
+                              df=df,
+                              model_type="Exp",
+                              seasonal=12,
+                              initialization_method='concentrated')
+                detectors.set_model(df_id, model)
+            elif model_id == 'SsmAD':
+                df = pd.DataFrame(list(zip(data.values, data.metrics)),
+                                  columns=['values', 'metrics'], index=pd.to_datetime(data.index))
+                df = df.pivot(columns='metrics', values='values')
+                df = df.asfreq(data.freq)
 
-            model = SsmAD(df=df,
-                          th_sigma=data.threshold,
-                          th_lower=data.th_lower,
-                          th_upper=data.th_upper,
-                          order=data.order,
-                          pre_log=data.pre_log
-                          )
-            detectors.set_model(df_id, model)
+                model = SsmAD(df=df,
+                              th_sigma=data.threshold,
+                              th_lower=data.th_lower,
+                              th_upper=data.th_upper,
+                              order=data.order,
+                              pre_log=data.pre_log
+                              )
+                detectors.set_model(df_id, model)
 
-        with open('state/' + df_id + '.model', 'w+') as file:
-            file.write(model_id)
-            file.close()
+            with open('state/' + df_id + '.model', 'w+') as file:
+                file.write(model_id)
+                file.close()
 
-        with open('state/'+df_id+'_DataModel.pkl', 'wb') as file:
-            pickle.dump(data, file)
-            file.close()
+            with open('state/'+df_id+'_DataModel.pkl', 'wb') as file:
+                pickle.dump(data, file)
+                file.close()
+
+            return "OK"
+        except Exception as e:
+            logger.error('%s', e, exc_info=True)
+            return "ERROR"
 
     @api.post("/startAD")
     def start_ad(df_id: str):
-        detectors.start(df_id=df_id)
+        try:
+            detectors.start(df_id=df_id)
+
+            return "OK"
+        except Exception as e:
+            logger.error('%s', e, exc_info=True)
+            return "ERROR"
 
     @api.get("/removeAD")
     def remove_ad(df_id: str):
-        res = detectors.remove(df_id=df_id)
-        influx_api = InfluxApi()
-        influx_api.delete(df_id)
-        influx_api.close()
-        logger.debug('\n %s', res)
+        try:
+            res = detectors.remove(df_id=df_id)
+            influx_api = InfluxApi()
+            influx_api.delete(df_id)
+            influx_api.close()
+            logger.debug('\n %s', res)
 
-        with open('state/state.ini', 'w') as file:
-            file.write('\n'.join(detectors.list_ad()))
-            file.close()
+            with open('state/state.ini', 'w') as file:
+                file.write('\n'.join(detectors.list_ad()))
+                file.close()
 
-        os.remove('state/' + df_id + '_DataModel.pkl')
-        os.remove('state/' + df_id + '_DataFrame.pkl')
-        os.remove('state/' + df_id + '.model')
+            os.remove('state/' + df_id + '_DataModel.pkl')
+            os.remove('state/' + df_id + '_DataFrame.pkl')
+            os.remove('state/' + df_id + '.model')
 
-        return res
+            return res
+        except Exception as e:
+            logger.error('%s', e, exc_info=True)
+            return "ERROR"
 
     @api.post("/fit")
     def fit(df_id: str, data: DataFrame):
-        df = pd.DataFrame(list(zip(data.values, data.metrics)),
-                          columns=['values', 'metrics'], index=pd.to_datetime(data.index))
-        df = df.pivot(columns='metrics', values='values')
-        df = df.asfreq(data.freq)
+        try:
+            df = pd.DataFrame(list(zip(data.values, data.metrics)),
+                              columns=['values', 'metrics'], index=pd.to_datetime(data.index))
+            df = df.pivot(columns='metrics', values='values')
+            df = df.asfreq(data.freq)
 
-        logger.debug('api.py: call to fit(), data:')
-        logger.debug('\n %s', df)
+            logger.debug('api.py: call to fit(), data:')
+            logger.debug('\n %s', df)
 
-        anomalies, anomaly_th_lower, anomaly_th_upper = detectors.fit(df_id, df)
-        influx_api = InfluxApi()
-        influx_api.delete(df_id)
-        influx_api.write(df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement=df_id, train=True)
-        influx_api.close()
+            anomalies, anomaly_th_lower, anomaly_th_upper = detectors.fit(df_id, df)
+            influx_api = InfluxApi()
+            influx_api.delete(df_id)
+            influx_api.write(df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement=df_id, train=True)
+            influx_api.close()
 
-        with open('state/' + df_id + '_DataFrame.pkl', 'wb') as file:
-            pickle.dump(data, file)
-            file.close()
+            with open('state/' + df_id + '_DataFrame.pkl', 'wb') as file:
+                pickle.dump(data, file)
+                file.close()
 
-        with open('state/state.ini', 'w') as file:
-            file.write('\n'.join(detectors.list_ad()))
+            with open('state/state.ini', 'w') as file:
+                file.write('\n'.join(detectors.list_ad()))
 
-        return "OK"
+            return "OK"
+        except Exception as e:
+            logger.error('%s', e, exc_info=True)
+            return "ERROR"
 
     @api.post("/detect")
     def detect(df_id: str, data: DataFrame):
@@ -218,28 +240,32 @@ def init(detectors):
         return set(detectors.list_ad())
 
     # Read system state
-    with open('state/state.ini') as file:
-        metrics = [line.rstrip('\n') for line in file]
-        file.close()
-    if metrics:
-        for metric in metrics:
-            logger.debug('Read system state (metric %s):', metric)
-            with open('state/' + metric + '.model') as file:
-                model = file.read()
-                file.close()
+    try:
+        with open('state/state.ini') as file:
+            metrics = [line.rstrip('\n') for line in file]
+            file.close()
+        if metrics:
+            for metric in metrics:
+                logger.debug('Read system state (metric %s):', metric)
+                with open('state/' + metric + '.model') as file:
+                    model = file.read()
+                    file.close()
 
-            with open('state/' + metric + '_DataModel.pkl', 'rb') as file:
-                dat_model = pickle.load(file)
-                file.close()
+                with open('state/' + metric + '_DataModel.pkl', 'rb') as file:
+                    dat_model = pickle.load(file)
+                    file.close()
 
-            with open('state/' + metric + '_DataFrame.pkl', 'rb') as file:
-                dat_frame = pickle.load(file)
-                file.close()
+                with open('state/' + metric + '_DataFrame.pkl', 'rb') as file:
+                    dat_frame = pickle.load(file)
+                    file.close()
 
-            new_ts(15, metric)
-            set_ad(metric, model, dat_model)
-            fit(metric, dat_frame)
-            start_ad(metric)
+                new_ts(15, metric)
+                set_ad(metric, model, dat_model)
+                fit(metric, dat_frame)
+                start_ad(metric)
+    except Exception as e:
+        logger.error('%s', e, exc_info=True)
+        return "ERROR"
 
     nest_asyncio.apply()
     cfg = uvicorn.Config(api, port=port, host="0.0.0.0", log_level="info")
