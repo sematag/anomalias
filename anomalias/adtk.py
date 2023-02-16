@@ -152,7 +152,7 @@ class AdtkAD:
 
         idx_anomaly['anomaly'] = idx_anomaly['nvot'] >= self.__nvot
 
-        idx_anomaly = idx_anomaly[idx_anomaly['anomaly'] == 1].astype(float)
+        idx_anomaly = idx_anomaly[idx_anomaly['anomaly'] == 1].astype(bool)
         idx_anomaly = idx_anomaly.reset_index().set_index('_time')
 
         idx_anomaly.index.rename(observations.index.name, inplace=True)
