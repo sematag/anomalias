@@ -128,6 +128,7 @@ class AdtkAD:
         for i, detector in enumerate(self.__model):
             print(i)
             anom = detector(param=params[i]).fit_detect(observations)
+            anom.index.rename('_time', inplace=True)
 
             if isinstance(anom, pd.Series):
                 anom = anom.to_frame()[[0] * observations.shape[-1]]
@@ -153,6 +154,8 @@ class AdtkAD:
 
         idx_anomaly = idx_anomaly[idx_anomaly['anomaly'] == 1].astype(float)
         idx_anomaly = idx_anomaly.reset_index().set_index('_time')
+
+        idx_anomaly.index.rename(observations.index.name, inplace=True)
 
         anomaly_th_lower = None
         anomaly_th_upper = None
