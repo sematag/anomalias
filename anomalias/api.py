@@ -55,7 +55,6 @@ class DataModel(BaseModel):
     nvot: int = 1
 
 
-
 class InfluxApi:
     def __init__(self):
         self.__client = InfluxDBClient(url=influx_url, token=token, org=org, timeout=timeout)
