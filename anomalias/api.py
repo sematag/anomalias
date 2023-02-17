@@ -121,6 +121,7 @@ def init(detectors):
             if model_id == 'AdtkAD':
                 model = AdtkAD(data.adtk_id, data.nvot)
                 detectors.set_model(df_id, model)
+                detectors.set_all_obs_detect(df_id, True)
             elif model_id == 'ExpAD':
                 df = pd.DataFrame(list(zip(data.values, data.metrics)),
                                   columns=['values', 'metrics'], index=pd.to_datetime(data.index))

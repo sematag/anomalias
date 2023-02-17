@@ -105,3 +105,11 @@ class Detectors:
         except Exception as e:
             logger.error('%s', e)
             return False
+
+    def set_all_obs_detect(self, df_id, bol):
+        try:
+            if self.__exist_id(df_id):
+                (self.__dataframes[self.__df_id.index(df_id)]).ad.set_all_obs_detect(bol)
+        except Exception as e:
+            logger.error('%s', e)
+            return None

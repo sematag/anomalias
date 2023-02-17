@@ -121,11 +121,13 @@ class AdtkAD:
         logger.info('Fitting model.')
         self.__df_train = train_data
         for i, detector in enumerate(self.__model):
+            logger.debug('Fit Adtk id: %s.', i)
             self.__model[i].fit(train_data)
 
     def detect(self, observations):
 
         for i, detector in enumerate(self.__model):
+            logger.debug('Detect Adtk id: %s.', i)
             anom = self.__model[i].detect(observations)
             anom.index.rename('_time', inplace=True)
 

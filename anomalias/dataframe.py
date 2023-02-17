@@ -49,5 +49,3 @@ class DataFrame(Thread):
 
     def resume(self):
         self.__paused = False
-
-

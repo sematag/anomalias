@@ -18,6 +18,7 @@ class Detector:
         self.__anomaly_th_lower = pd.DataFrame([])
         self.__dataFrame = pd.DataFrame([])
         self.__model = None
+        self.__allObs = False
 
         self.__training = False
         self.__paused = False
@@ -59,9 +60,17 @@ class Detector:
 
             # Detection
             if not df.empty:
-                anomalies, anomaly_th_lower, anomaly_th_upper = self.__model.detect(df)
-                anomalies = anomalies.astype('boolean')
+                if self.__allObs:
+                    anomalies, anomaly_th_lower, anomaly_th_upper = self.__model.detect(self.__dataFrame)
+                    anomalies = anomalies[df]
+                    if anomaly_th_lower is not None:
+                        anomaly_th_lower = anomaly_th_lower[df]
+                    if anomaly_th_upper is not None:
+                        anomaly_th_upper = anomaly_th_upper[df]
+                else:
+                    anomalies, anomaly_th_lower, anomaly_th_upper = self.__model.detect(df)
 
+                anomalies = anomalies.astype('boolean')
                 self.__anomalies = pd.concat([self.__anomalies, anomalies]).iloc[-self.__len:]
 
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
@@ -78,4 +87,7 @@ class Detector:
 
     def get_detection(self):
         return self.__dataFrame.copy(), self.__anomalies.copy()
+
+    def set_all_obs_detect(self, bol):
+        self.__allObs = bol
 
