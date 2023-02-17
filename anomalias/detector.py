@@ -62,11 +62,11 @@ class Detector:
             if not df.empty:
                 if self.__allObs:
                     anomalies, anomaly_th_lower, anomaly_th_upper = self.__model.detect(self.__dataFrame)
-                    anomalies = anomalies[df]
+                    anomalies = anomalies.loc[df.index.intersection(anomalies.index)]
                     if anomaly_th_lower is not None:
-                        anomaly_th_lower = anomaly_th_lower[df]
+                        anomaly_th_lower = anomaly_th_lower.loc[df.index]
                     if anomaly_th_upper is not None:
-                        anomaly_th_upper = anomaly_th_upper[df]
+                        anomaly_th_upper = anomaly_th_upper.loc[df.index]
                 else:
                     anomalies, anomaly_th_lower, anomaly_th_upper = self.__model.detect(df)
 
