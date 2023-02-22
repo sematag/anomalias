@@ -79,12 +79,12 @@ class SsmAD:
         if self.__th_lower is not None:
             anomaly_th_lower.clip(lower=self.__th_lower, inplace=True)
         else:
-            anomaly_th_lower.clip(lower=10 * np.nanmin(anomaly_th_lower[anomaly_th_lower != -np.inf]), inplace=True)
+            anomaly_th_lower.clip(lower=np.nanmin(anomaly_th_lower[anomaly_th_lower != -np.inf]), inplace=True)
 
         if self.__th_upper is not None:
             anomaly_th_upper.clip(upper=self.__th_upper, inplace=True)
         else:
-            anomaly_th_upper.clip(upper=10 * np.nanmax(anomaly_th_upper[anomaly_th_upper != np.inf]), inplace=True)
+            anomaly_th_upper.clip(upper=np.nanmax(anomaly_th_upper[anomaly_th_upper != np.inf]), inplace=True)
 
         idx_anomaly = (df > anomaly_th_upper) | (df < anomaly_th_lower)
 
