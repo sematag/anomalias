@@ -18,7 +18,7 @@ class SsmAD:
         self.__th_upper = th_upper
 
         if pre_log:
-            self.__pre = lambda x: np.logp(x + log_cnt)
+            self.__pre = lambda x: np.log(x + log_cnt)
             self.__inv_pre = lambda x: np.exp(x) - log_cnt
         else:
             self.__pre = lambda x: x
