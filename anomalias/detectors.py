@@ -31,22 +31,6 @@ class Detectors:
             logger.error('%s', e)
             return None
 
-    # def ssm_ad(self, df_id, th, df, model_type, **kwargs):
-    #     try:
-    #         if self.__exist_id(df_id):
-    #             (self.__dataframes[self.__df_id.index(df_id)]).ad.ssm_ad(th, df, model_type, **kwargs)
-    #     except Exception as e:
-    #         logger.error('%s', e)
-    #         return None
-    #
-    # def adtk_ad(self, df_id, model_type, **kwargs):
-    #     try:
-    #         if self.__exist_id(df_id):
-    #             (self.__dataframes[self.__df_id.index(df_id)]).ad.adtk_ad(model_type, **kwargs)
-    #     except Exception as e:
-    #         logger.error('%s', e)
-    #         return None
-
     def remove(self, df_id):
         try:
             if self.__exist_id(df_id):

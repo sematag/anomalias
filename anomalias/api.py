@@ -181,13 +181,7 @@ def init(detectors):
             influx_api.close()
             logger.debug('\n %s', res)
 
-            with open('state/state.ini', 'w') as file:
-                file.write('\n'.join(detectors.list_ad()))
-                file.close()
-
-            os.remove('state/' + df_id + '_DataModel.pkl')
-            os.remove('state/' + df_id + '_DataFrame.pkl')
-            os.remove('state/' + df_id + '.model')
+            __del_metric_from_state(df_id)
 
             return res
         except Exception as e:
@@ -269,6 +263,22 @@ def init(detectors):
     except Exception as e:
         logger.error('%s', e, exc_info=True)
         return "ERROR"
+
+    def __del_metric_from_state(df_id):
+        with open('state/state.ini', 'w') as file:
+            file.write('\n'.join(detectors.list_ad()))
+            file.close()
+
+        fp1 = 'state/' + df_id + '_DataModel.pkl'
+        fp2 = 'state/' + df_id + '_DataFrame.pkl'
+        fp3 = 'state/' + df_id + '.model'
+
+        if os.path.exists(fp1):
+            os.remove(fp1)
+        if os.path.exists(fp2):
+            os.remove(fp2)
+        if os.path.exists(fp3):
+            os.remove(fp3)
 
     nest_asyncio.apply()
     cfg = uvicorn.Config(api, port=port, host="0.0.0.0", log_level="info")

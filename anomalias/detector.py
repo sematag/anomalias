@@ -28,18 +28,6 @@ class Detector:
             self.__model = model
             self.__available.notify()
 
-    # def ssm_ad(self, th, df, model_type, **kwargs):
-    #     with self.__available:
-    #         # Model
-    #         logger.info('Creating Anomaly Detector.')
-    #         self.__model = SsmAD(th, df, model_type, **kwargs)
-    #         self.__available.notify()
-    #
-    # def adtk_ad(self, model_type, **kargs):
-    #     with self.__available:
-    #         self.__model = AdtkAD(model_type, **kargs)
-    #         self.__available.notify()
-
     def fit(self, df):
         with self.__available:
             self.__model.fit(df)
