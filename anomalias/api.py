@@ -55,7 +55,9 @@ class DataModel(BaseModel):
     pre_log: bool = False
     log_cnt: int = 1
     # Adtk params
-    adtk_id: list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+    adtk_id: list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    adtk_params: list = [0.00203, 0.00809, 8.7, 0.00102, 1.81, 0.98,
+                         6.56, 8.08, 0.44, (0.00101, 288), (7.87, 288), (16.9, 1), 8]
     nvot: int = 1
 
 
@@ -123,7 +125,7 @@ def init(detectors):
     def set_ad(df_id: str, model_id: str, data: DataModel):
         try:
             if model_id == 'AdtkAD':
-                model = AdtkAD(data.adtk_id, data.nvot)
+                model = AdtkAD(data.adtk_id, data.adtk_params, data.nvot)
                 detectors.set_model(df_id, model)
                 detectors.set_all_obs_detect(df_id, True)
             elif model_id == 'ExpAD':
