@@ -127,7 +127,7 @@ def init(detectors):
     def set_ad(df_id: str, model_id: str, data: DataModel):
         try:
             if model_id == 'AdtkAD':
-                params = data.adtk_params
+                params = data.adtk_params.copy()
                 params[9] = (params[9], data.adtk_freq)
                 params[10] = (params[10], data.adtk_freq)
                 params[11] = (params[11], data.adtk_pca_k)
