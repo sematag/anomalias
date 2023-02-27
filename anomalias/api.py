@@ -42,15 +42,19 @@ class DataFrame(BaseModel):
 
 
 class DataModel(BaseModel):
+    # Base params
     index: list
     values: list
     metrics: List[str]
     freq: str
+    # SSM params
     threshold: float = 4
     order: list = (1, 1, 2)
     th_lower: float = None
     th_upper: float = None
     pre_log: bool = False
+    log_cnt: int = 1
+    # Adtk params
     adtk_id: list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
     nvot: int = 1
 
@@ -145,7 +149,8 @@ def init(detectors):
                               th_lower=data.th_lower,
                               th_upper=data.th_upper,
                               order=data.order,
-                              pre_log=data.pre_log
+                              pre_log=data.pre_log,
+                              log_cnt=data.log_cnt
                               )
                 detectors.set_model(df_id, model)
 

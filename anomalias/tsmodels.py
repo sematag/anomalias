@@ -11,25 +11,23 @@ logger = log.logger('ssmad')
 
 
 class SsmAD:
-    def __init__(self, df, th_sigma, th_lower=None, th_upper=None, pre_log=False, **kwargs):
+    def __init__(self, df, th_sigma, th_lower=None, th_upper=None, pre_log=False, log_cnt=1):
         logger.info('Setting SARIMAX model.')
         self.__th_sigma = th_sigma
         self.__th_lower = th_lower
         self.__th_upper = th_upper
 
         if pre_log:
-            self.__pre = lambda x: np.log1p(x)
-            self.__inv_pre = lambda x: np.exp(x) - 1
+            self.__pre = lambda x: np.logp(x + log_cnt)
+            self.__inv_pre = lambda x: np.exp(x) - log_cnt
         else:
             self.__pre = lambda x: x
             self.__inv_pre = lambda x: x
 
-        self.__model = SARIMAX(self.__pre(df), **kwargs)
+        self.__model = SARIMAX(self.__pre(df))
         self.__init = True
         self.__trained = False
         self.__model_fit = None
-
-        # logger.debug('%s', self.__model_fit.fittedvalues)
 
     def fit(self, df):
         # Fit params
