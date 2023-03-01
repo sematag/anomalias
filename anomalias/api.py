@@ -11,7 +11,8 @@ from pydantic import BaseModel
 
 from typing import List
 
-import nest_asyncio
+
+#import nest_asyncio
 import uvicorn
 import configparser
 
