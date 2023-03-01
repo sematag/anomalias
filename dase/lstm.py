@@ -1,8 +1,8 @@
 import torch
 import numpy as np
 import pandas as pd
-from dase.das.anomaly import TrainAnomalyGenerator
-from dase.das.processor import NoiseFilter, MinMaxNormalizer
+from dase.anomaly import TrainAnomalyGenerator
+from dase.processor import NoiseFilter, MinMaxNormalizer
 import optuna
 from optuna.pruners import SuccessiveHalvingPruner
 from sklearn.metrics import f1_score, precision_score, recall_score
