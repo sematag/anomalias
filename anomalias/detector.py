@@ -1,8 +1,6 @@
 import pandas as pd
 import anomalias.log as log
 from threading import Condition
-from anomalias.tsmodels import SsmAD
-from anomalias.adtk import AdtkAD
 
 logger = log.logger('Detector')
 

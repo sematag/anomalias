@@ -16,8 +16,7 @@ import nest_asyncio
 import uvicorn
 import configparser
 
-from anomalias.tsmodels import SsmAD, ExpAD
-from anomalias.adtk import AdtkAD
+from dase.lstm import LSTM_AD
 
 logger = log.logger('API')
 
@@ -137,17 +136,13 @@ def init(detectors):
                 model = AdtkAD(data.adtk_id, params, data.nvot)
                 detectors.set_model(df_id, model)
                 detectors.set_all_obs_detect(df_id, True)
-            elif model_id == 'ExpAD':
+            elif model_id == 'LstmAD':
                 df = pd.DataFrame(list(zip(data.values, data.metrics)),
                                   columns=['values', 'metrics'], index=pd.to_datetime(data.index))
                 df = df.pivot(columns='metrics', values='values')
                 df = df.asfreq(data.freq)
 
-                model = ExpAD(th=1,
-                              df=df,
-                              model_type="Exp",
-                              seasonal=12,
-                              initialization_method='concentrated')
+                model = LSTM_AD()
                 detectors.set_model(df_id, model)
             elif model_id == 'SsmAD':
                 df = pd.DataFrame(list(zip(data.values, data.metrics)),
