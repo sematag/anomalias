@@ -82,18 +82,19 @@ class InfluxApi:
             for metric in df:
                 df_out = df[metric].to_frame()
 
-                anomalies_out = anomalies[metric]
-                anomalies_out = anomalies[anomalies_out].rename(columns={metric: 'anomaly'}).astype(int)
-                logger.debug('api.py: anomalies to write (measurement %s):', measurement)
+                if metric in anomalies.columns:
+                    anomalies_out = anomalies[metric]
+                    anomalies_out = anomalies[anomalies_out].rename(columns={metric: 'anomaly'}).astype(int)
+                    logger.debug('api.py: anomalies to write (measurement %s):', measurement)
+                    logger.debug('\n %s', anomalies_out)
+                    self.__write_api.write(bk, org, record=anomalies_out, data_frame_measurement_name=measurement,
+                                           data_frame_tag_columns=None)
+
+                logger.debug('api.py: data to write (measurement %s):', measurement)
                 logger.debug('\n %s', df_out)
-                logger.debug('\n %s', anomalies_out)
-
-                logger.debug('\n %s', bk)
-
                 self.__write_api.write(bk, org, record=df_out, data_frame_measurement_name=measurement,
                                        data_frame_tag_columns=None)
-                self.__write_api.write(bk, org, record=anomalies_out, data_frame_measurement_name=measurement,
-                                       data_frame_tag_columns=None)
+
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
                     anomaly_th_lower_out = anomaly_th_lower[metric].to_frame()
                     anomaly_th_lower_out = anomaly_th_lower_out.rename(columns={metric: 'anomalyThL'})
