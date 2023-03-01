@@ -16,7 +16,7 @@ import nest_asyncio
 import uvicorn
 import configparser
 
-from dase.das.lstm import LSTM_AD
+from dase.lstm import LSTM_AD
 
 logger = log.logger('API')
 
