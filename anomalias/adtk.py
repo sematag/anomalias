@@ -27,36 +27,32 @@ def detector_1(param=0.05):
 
 
 def detector_2(param=5):
-    return  InterQuartileRangeAD(c=param)
-
-
-def detector_3(param=0.01):
-    return QuantileAD(high=1-param, low=param/2)
-
-
-def detector_4(param=5):
     return InterQuartileRangeAD(c=param)
 
 
-def detector_5(param=0.01):
+def detector_3(param=0.01):
+    return QuantileAD(high=1-param, low=param)
+
+
+def detector_4(param=0.01):
     return GeneralizedESDTestAD(alpha=param)
 
 
 # Point/Level/Volatility Change
-def detector_6(param=0.1):
+def detector_5(param=0.1):
     return PersistAD(c=param)
 
 
-def detector_7(param=3.0):
+def detector_6(param=3.0):
     return LevelShiftAD(c=param, side='both', window=5)
 
 
-def detector_8(param=3.0):
+def detector_7(param=3.0):
     return VolatilityShiftAD(c=param, side='negative', window=5)
 
 
 # Seasonal - Regression
-def detector_9(params):
+def detector_8(params):
     eps = params[0]
     steps2 = [
         ("ETS", ClassicSeasonalDecomposition(freq=params[1])),
@@ -65,22 +61,22 @@ def detector_9(params):
     return Pipeline(steps2)
 
 
-def detector_10(params):
+def detector_9(params):
     return SeasonalAD(c=params[0], freq=params[1], side="both")
 
 
 # Otros
-def detector_11(params):
+def detector_10(params):
     return PcaAD(c=params[0], k=params[1])
 
 
-def detector_12(param=3):
+def detector_11(param=3):
     return MinClusterDetector(KMeans(n_clusters=param))
 
 
 detector_lst = [detector_0, detector_1, detector_2, detector_3, detector_4,
                 detector_5, detector_6, detector_7, detector_8, detector_9,
-                detector_10, detector_11, detector_12]
+                detector_10, detector_11]
 
 
 class AdtkAD:
