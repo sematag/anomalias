@@ -44,7 +44,17 @@ def preprocessing(dataRaw=None, flag_scaler=True, scaler=None, scaler_name=None,
             X = scaler.inverse_transform(X)
     
     X = pd.DataFrame(X, index=dataRaw.index, columns=dataRaw.columns)
-    return X     
+    return X   
+
+
+def  scaler01(df, scaler_filename, instance='transform'):
+    scaler = pickle.load(open(scaler_filename,'rb'))
+    if instance == 'transform'
+        df = scaler.transform(df)
+    elif instance == 'inverse':
+        df = scaler.inverse_transform(df)
+    
+    return df
 
 
 def sincos_transf(x, period):
@@ -82,6 +92,45 @@ def MTS2UTS_cond(ds=None, T=32, seed=42):
     columns = ds.columns
     col_embedd = np.arange(C)/C
     time_cond = time_info_embedd(ds)
+    samples_aux_time_cond = [time_cond[i: i + T] for i in range(0, N - T+1)]
+    
+    samples_time_cond = []
+    samples_values = []
+    samples_class = []
+    for c in range(C):
+        serie_values = ds.iloc[:,c].values
+        samples_aux_values = [serie_values[i: i + T] for i in range(0, N - T+1)]  
+        samples_aux_class = list(col_embedd[c]*np.ones((len(samples_aux_values), T, 1)))
+        samples_time_cond += samples_aux_time_cond
+        samples_values += samples_aux_values
+        samples_class += samples_aux_class
+
+    samples_values = np.array(samples_values)
+    samples_info = np.concatenate([np.array(samples_time_cond), np.array(samples_class)], axis=-1) 
+    return samples_values, samples_info
+
+
+def embedd_series_name(name):
+    embedd={AACallCostHome	
+            AACallCountHome	
+            AADatosCost	
+            AADatosTrafic	
+            AASmsCost	
+            AASmsCount	
+            ADAATopupCostSinPerioTotal	
+            ADAATopupCountSinPerioTotal	
+            ECpagos_cost	
+            ECpagos_count	
+            GeoswitchPagosCost	
+            GeoswitchPagosCount
+}
+
+
+def samples2model(df=None, T=32, seed=42):
+
+    column = df.columns
+    col_embedd = np.arange(C)/C
+    time_cond = time_info_embedd(df)
     samples_aux_time_cond = [time_cond[i: i + T] for i in range(0, N - T+1)]
     
     samples_time_cond = []

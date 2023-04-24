@@ -8,14 +8,14 @@ Created on Fri Apr 29 07:03:05 2022
 
 
 import tensorflow as tf
-from tensorflow.keras.layers import Layer
+from tensorflow.keras.layers import Input, Layer, Lambda
 from tensorflow.keras.models import Model
 from tensorflow.keras import backend as K
 from tensorflow import keras
 import pandas as pd
 import numpy as np
 import pickle
-from utils import preprocessing, MTS2UTS_cond
+from utils import scaler01, MTS2UTS_cond
 from sklearn.preprocessing import StandardScaler
 
 from anomalias import log
@@ -48,9 +48,11 @@ class DCVAE:
     def __init__(self, th_sigma, th_lower=None, th_upper=None, 
                  model_path='', 
                  model_name='dc-vae_best_model',
+                 scaler_filename='',
                  T=128,
                  batch_size=32,
                  epochs=100,
+                 validation_split=0.2,
                    **kwargs):
         logger.info('Setting DCVAE model.')
         self.__th_sigma = th_sigma
@@ -61,7 +63,9 @@ class DCVAE:
         self.__batch_size = batch_size
         self.__epochs = epochs
         self.__scaler = StandardScaler()
+        self.__validation_split = validation_split
         self.__model_name = model_name
+        self.__scaler_filename = scaler_filename
 
         logger.info('Model name: '+model_name)
         self.__model = None
@@ -71,60 +75,27 @@ class DCVAE:
                                                     custom_objects={'sampling': Sampling},
                                                     compile = True)
 
-    def fit(self, df=None, val_percent=0.1):
-    
-        # Data preprocess
-        df_process = preprocessing(df, flag_scaler=True, scaler=self.__scaler, 
-                        scaler_name=self.__model_name, outliers_out=True, outliers_max_std=7,
-                        instance='fit')
-
-        X, cond_info = MTS2UTS_cond(df_process, T=self.__T)
-        ix_rand = np.random.permutation(X.shape[0])
-        X = np.array(X)[ix_rand]
-        cond_info = np.array(cond_info)[ix_rand]  
-
-        # Callbacks
-        early_stopping_cb = keras.callbacks.EarlyStopping(min_delta=1e-2,
-                                                      patience=5,                                            
-                                                      verbose=1,
-                                                      mode='min')
-        model_checkpoint_cb= keras.callbacks.ModelCheckpoint(
-            filepath=self.name+'_best_model.h5',
-            verbose=1,
-            mode='min',
-            save_best_only=True)
-        
-          
-        # Model train
-        self.__history_ = self.__model_fit.fit((X, cond_info),
-                     batch_size=self.batch_size,
-                     epochs=self.epochs,
-                     validation_split = val_percent,
-                     callbacks=[early_stopping_cb,
-                                model_checkpoint_cb]
-                     ) 
-        
-        # Save models
-
-        self.__model_fit.vae.save(self.__model_name+'_refit.h5')
-
+    def fit(self, df=None):
+        '''
+        Por ahora no creemos conveniente habilitar el entrenamiento para este método.
+        Como mucho se podría hacer un ajuste para una nueva serie. Pero eso queda para más adelante.
+        '''
         return self
          
     def detect(self, df):
-        if self.__init:
-            self.__model_fit = self.__model_fit.apply(endog=self.__pre(df), refit=False)
-            self.__init = False
-
 
         # Inference model. Auxiliary model so that in the inference 
         # the prediction is only the last value of the sequence
-        inp = Input(shape=(self.T, self.M))
-        x = self.vae(inp) # apply trained model on the input
+        inp = Input(shape=(self.T, 1))
+        x = self.__model_fit(inp) # apply trained model on the input
         out = Lambda(lambda y: [y[0][:,-1,:], y[1][:,-1,:]])(x)
         inference_model = Model(inp, out)
         
         # Data preprocess
-        sam_val, sam_ix, sam_class = MTS2UTS_cond(df_X, T=self.T)
+        # Normalization
+        df = scaler01(df, self.__scaler_filename, 'transform')
+
+        sam_val, sam_info = MTS2UTS_cond(df, T=self.__T)
         
         # Predictions
         prediction = self.vae.predict(np.stack(sam_val))
@@ -161,21 +132,4 @@ class DCVAE:
             return df_predict, df_reconstruct, df_sig, latent_space, sam_ix, sam_class
 
 
-    def evaluate(self, df_X=None, load_model=False, model='best_model'):
-        # Data preprocess
-        sam_val, sam_ix, sam_class = MTS2UTS(df_X, T=self.T)
-
-        # Trained model
-        if load_model:
-            print('=====================================')
-            self.vae = keras.models.load_model(self.name+'_'+model+'.h5',
-                                                    custom_objects={'sampling': Sampling},
-                                                    compile = True)
-
-        # Model evaluate
-        value_elbo, reconstruction, kl = self.vae.evaluate(np.stack(sam_val), np.stack(sam_val),
-                     batch_size=self.batch_size,
-                     )  
-        
-        return value_elbo, reconstruction, kl
         

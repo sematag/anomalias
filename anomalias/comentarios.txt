@@ -1,0 +1,13 @@
+24/04
+Los datos tienen que estar normalizados para entrar a la red.
+Para esto se tiene que tener disponible un escaler para cada serie.
+Al iniciar el modelo se levanta uno de los archivos .pkl que
+corresponde a la serie.
+Se creo una nueva función en utils.py escaler01 que dado una archivo,
+le aplica un df la transformación o la inversa.
+
+Luego se creo una nueva función basada en MTS2UTS_cond, que le llamamos
+samles2model que hace lo mismo pero para un secuencia de serie univariada.
+Para poner la información de la serie al modelo, creo que lo mejor es
+agregar un dicciónario donde la key sea el nombre original de la serie
+y el valor, la fracción que le corresponda posición/total.
