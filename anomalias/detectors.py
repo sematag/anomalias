@@ -44,7 +44,9 @@ class Detectors:
             return "ERROR"
 
     def list_ad(self):
-        return self.__df_id
+        # List running detectors
+        active_ad = [self.__dataframes[self.__df_id.index(df_id)].is_alive() for df_id in self.__df_id]
+        return self.__df_id[active_ad]
 
     def start(self, df_id):
         try:
