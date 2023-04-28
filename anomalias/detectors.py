@@ -44,6 +44,10 @@ class Detectors:
             return "ERROR"
 
     def list_ad(self):
+        # List all detectors
+        return self.__df_id
+
+    def active_ad(self):
         # List running detectors
         active_ad = [df_id for df_id in self.__df_id if self.__dataframes[self.__df_id.index(df_id)].is_alive()]
         return active_ad
