@@ -250,7 +250,7 @@ def init(detectors):
 
     @api.get("/listAD")
     def list_ad():
-        return detectors.list_ad()
+        return set(detectors.list_ad())
 
     # Read system state
     try:
