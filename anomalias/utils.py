@@ -9,6 +9,9 @@ Created on Fri Apr 29 14:34:43 2022
 import pandas as pd
 import numpy as np
 import pickle
+from anomalias import log
+
+logger = log.logger('utils')
 
 
 def set_index(dataRaw):
@@ -49,11 +52,10 @@ def preprocessing(dataRaw=None, flag_scaler=True, scaler=None, scaler_name=None,
 
 def  scaler01(df, scaler_filename, instance='transform'):
     scaler = pickle.load(open(scaler_filename,'rb'))
-    if instance == 'transform'
+    if instance == 'transform':
         df = scaler.transform(df)
     elif instance == 'inverse':
         df = scaler.inverse_transform(df)
-    
     return df
 
 
@@ -110,40 +112,46 @@ def MTS2UTS_cond(ds=None, T=32, seed=42):
     return samples_values, samples_info
 
 
-def embedd_series_name(name):
-    embedd={AACallCostHome	
-            AACallCountHome	
-            AADatosCost	
-            AADatosTrafic	
-            AASmsCost	
-            AASmsCount	
-            ADAATopupCostSinPerioTotal	
-            ADAATopupCountSinPerioTotal	
-            ECpagos_cost	
-            ECpagos_count	
-            GeoswitchPagosCost	
-            GeoswitchPagosCount
+series_embedd={'AACallCostHome': 1/1,	
+            'AACallCountHome': 1/2,	
+            'AADatosCost': 1/3,	
+            'AADatosTrafic': 1/4,	
+            'AASmsCost': 1/5,	
+            'AASmsCount': 1/6,	
+            'ADAATopupCostSinPerioTotal': 1/7,	
+            'ADAATopupCountSinPerioTotal': 1/8,	
+            'ECpagos_cost': 1/9,	
+            'ECpagos_count': 1/10,	
+            'GeoswitchPagosCost': 1/11,	
+            'GeoswitchPagosCount': 1/12
 }
 
 
-def samples2model(df=None, T=32, seed=42):
+def samples2model(df=None):
 
-    column = df.columns
-    col_embedd = np.arange(C)/C
-    time_cond = time_info_embedd(df)
-    samples_aux_time_cond = [time_cond[i: i + T] for i in range(0, N - T+1)]
+    dict_series_embedd={'AACallCostHome': 1/1,	
+            'AACallCountHome': 1/2,	
+            'AADatosCost': 1/3,	
+            'AADatosTrafic': 1/4,	
+            'AASmsCost': 1/5,	
+            'AASmsCount': 1/6,	
+            'ADAATopupCostSinPerioTotal': 1/7,	
+            'ADAATopupCountSinPerioTotal': 1/8,	
+            'ECpagos_cost': 1/9,	
+            'ECpagos_count': 1/10,	
+            'GeoswitchPagosCost': 1/11,	
+            'GeoswitchPagosCount': 1/12
+    }
+
+    serie_name = df.columns
+    if serie_name in dict_series_embedd.keys():
+        col_embedd = dict_series_embedd[serie_name]
+    else:
+        logger.info('Error: Time serie name out of list. The list of series names is: %s', dict_series_embedd.keys()) 
+        return None
     
-    samples_time_cond = []
-    samples_values = []
-    samples_class = []
-    for c in range(C):
-        serie_values = ds.iloc[:,c].values
-        samples_aux_values = [serie_values[i: i + T] for i in range(0, N - T+1)]  
-        samples_aux_class = list(col_embedd[c]*np.ones((len(samples_aux_values), T, 1)))
-        samples_time_cond += samples_aux_time_cond
-        samples_values += samples_aux_values
-        samples_class += samples_aux_class
-
-    samples_values = np.array(samples_values)
-    samples_info = np.concatenate([np.array(samples_time_cond), np.array(samples_class)], axis=-1) 
+    samples_values = df.values
+    samples_time_cond = time_info_embedd(df)
+    samples_serie_cond = col_embedd*np.ones((df.shape[0], 1))
+    samples_info = np.concatenate([samples_time_cond, samples_serie_cond], axis=-1) 
     return samples_values, samples_info

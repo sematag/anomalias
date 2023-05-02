@@ -15,7 +15,7 @@ from tensorflow import keras
 import pandas as pd
 import numpy as np
 import pickle
-from utils import scaler01, MTS2UTS_cond
+from utils import scaler01, samples2model
 from sklearn.preprocessing import StandardScaler
 
 from anomalias import log
@@ -74,6 +74,9 @@ class DCVAE:
         self.__model_fit = keras.models.load_model(model_path+model_name+'.h5',
                                                     custom_objects={'sampling': Sampling},
                                                     compile = True)
+        self.info('Model Encoder:', self.__model_fit.encoder.summary())
+        self.info('Model Decoder:', self.__model_fit.decoder.summary())
+        self.info('Model VAE:', self.__model_fit.vae.summary())
 
     def fit(self, df=None):
         '''
@@ -83,53 +86,40 @@ class DCVAE:
         return self
          
     def detect(self, df):
-
-        # Inference model. Auxiliary model so that in the inference 
-        # the prediction is only the last value of the sequence
-        inp = Input(shape=(self.T, 1))
-        x = self.__model_fit(inp) # apply trained model on the input
-        out = Lambda(lambda y: [y[0][:,-1,:], y[1][:,-1,:]])(x)
-        inference_model = Model(inp, out)
         
         # Data preprocess
         # Normalization
-        df = scaler01(df, self.__scaler_filename, 'transform')
-
-        sam_val, sam_info = MTS2UTS_cond(df, T=self.__T)
+        df_norm = scaler01(df, self.__scaler_filename, 'transform')
+        sam_val, sam_info = samples2model(df_norm)
         
         # Predictions
-        prediction = self.vae.predict(np.stack(sam_val))
-        # The first T-1 data of each sequence are discarded
-        reconstruct = prediction[0]
-        sig = np.sqrt(np.exp(prediction[1]))
-        
-        # Data evaluate (The first T-1 data are discarded)
-        df_evaluate = UTS2MTS(sam_val, sam_ix, sam_class)
-        df_reconstruct = UTS2MTS(reconstruct, sam_ix, sam_class)
-        df_sig = UTS2MTS(sig, sam_ix, sam_class)
-        
-        # Thresholds
-        if len(alpha_set) == self.M:
-            alpha = np.array(alpha_set)
-        elif load_alpha:
-            with open(self.name + '_alpha.pkl', 'rb') as f:
-                alpha = pickle.load(f)
-                f.close()
-        else:
-            alpha = self.alpha
-            
-        thdown = df_reconstruct.values - alpha*df_sig.values
-        thup = df_reconstruct.values + alpha*df_sig.values
-        
-        # Evaluation
-        pred = (df_evaluate.values < thdown) | (df_evaluate.values > thup)
-        df_predict = pd.DataFrame(pred, columns=df_X.columns, index=df_X.iloc[self.T-1:].index)
-        
-        if only_predict:
-            return df_predict
-        else:
-            latent_space = self.encoder.predict(np.stack(sam_val))[2]
-            return df_predict, df_reconstruct, df_sig, latent_space, sam_ix, sam_class
+        prediction = self.vae.predict((sam_val, sam_info))
 
+        predicted_mean = pd.DataFrame(values=prediction[0], index=df.index, 
+                                      columns=df.columns)
+        predicted_sigma = pd.DataFrame(values=np.sqrt(np.exp(prediction[1])), index=df.index, 
+                                      columns=df.columns)
+        if isinstance(predicted_mean, pd.Series):
+            predicted_mean = predicted_mean.to_frame()
+            predicted_sigma = predicted_sigma.to_frame()
 
+        predicted_mean = scaler01(predicted_mean, 'inverse')
+        predicted_sigma = scaler01(predicted_sigma, 'inverse')
+        
+        anomaly_th_lower = predicted_mean.values - self.__th_sigma * predicted_sigma.values
+        anomaly_th_upper = predicted_mean.values + self.__th_sigma * predicted_sigma.values
+
+        if self.__th_lower is not None:
+            anomaly_th_lower.clip(lower=self.__th_lower, inplace=True)
+        else:
+            anomaly_th_lower.clip(lower=np.nanmin(anomaly_th_lower[anomaly_th_lower != -np.inf]), inplace=True)
+
+        if self.__th_upper is not None:
+            anomaly_th_upper.clip(upper=self.__th_upper, inplace=True)
+        else:
+            anomaly_th_upper.clip(upper=np.nanmax(anomaly_th_upper[anomaly_th_upper != np.inf]), inplace=True)
+
+        idx_anomaly = (df > anomaly_th_upper) | (df < anomaly_th_lower)
+
+        return idx_anomaly, anomaly_th_lower, anomaly_th_upper
         
