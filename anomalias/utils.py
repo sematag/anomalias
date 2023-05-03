@@ -9,7 +9,7 @@ Created on Fri Apr 29 14:34:43 2022
 import pandas as pd
 import numpy as np
 import pickle
-from anomalias import log
+import log
 
 logger = log.logger('utils')
 
@@ -110,21 +110,6 @@ def MTS2UTS_cond(ds=None, T=32, seed=42):
     samples_values = np.array(samples_values)
     samples_info = np.concatenate([np.array(samples_time_cond), np.array(samples_class)], axis=-1) 
     return samples_values, samples_info
-
-
-series_embedd={'AACallCostHome': 1/1,	
-            'AACallCountHome': 1/2,	
-            'AADatosCost': 1/3,	
-            'AADatosTrafic': 1/4,	
-            'AASmsCost': 1/5,	
-            'AASmsCount': 1/6,	
-            'ADAATopupCostSinPerioTotal': 1/7,	
-            'ADAATopupCountSinPerioTotal': 1/8,	
-            'ECpagos_cost': 1/9,	
-            'ECpagos_count': 1/10,	
-            'GeoswitchPagosCost': 1/11,	
-            'GeoswitchPagosCount': 1/12
-}
 
 
 def samples2model(df=None):

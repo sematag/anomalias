@@ -46,8 +46,8 @@ class Sampling(Layer):
 
 class DCVAE:
     def __init__(self, th_sigma, th_lower=None, th_upper=None, 
-                 model_path='', 
-                 model_name='dc-vae_best_model',
+                 model_path='model_files/', 
+                 model_name='dc_cvae_uni_best_model',
                  scaler_filename='',
                  T=128,
                  batch_size=32,
