@@ -9,7 +9,7 @@ Created on Fri Apr 29 14:34:43 2022
 import pandas as pd
 import numpy as np
 import pickle
-import log
+from anomalias import log
 
 logger = log.logger('utils')
 
@@ -50,13 +50,15 @@ def preprocessing(dataRaw=None, flag_scaler=True, scaler=None, scaler_name=None,
     return X   
 
 
-def  scaler01(df, scaler_filename, instance='transform'):
+def scaler01(df, scaler_filename, instance='transform'):
     scaler = pickle.load(open(scaler_filename,'rb'))
     if instance == 'transform':
-        df = scaler.transform(df)
+        vals = scaler.transform(df)
     elif instance == 'inverse':
-        df = scaler.inverse_transform(df)
-    return df
+        vals = scaler.inverse_transform(df)
+    df_scaled = pd.DataFrame(data=vals, index=df.index, 
+                             columns=df.columns)
+    return df_scaled
 
 
 def sincos_transf(x, period):
@@ -128,7 +130,7 @@ def samples2model(df=None):
             'GeoswitchPagosCount': 1/12
     }
 
-    serie_name = df.columns
+    serie_name = df.columns[0]
     if serie_name in dict_series_embedd.keys():
         col_embedd = dict_series_embedd[serie_name]
     else:

@@ -16,8 +16,9 @@ import nest_asyncio
 import uvicorn
 import configparser
 
-from anomalias.tsmodels import SsmAD, ExpAD
-from anomalias.adtk import AdtkAD
+#from anomalias.tsmodels import SsmAD, ExpAD
+#from anomalias.adtk import AdtkAD
+from anomalias.dcvaemodel import DcvaeAD
 
 logger = log.logger('API')
 
@@ -128,40 +129,11 @@ def init(detectors):
     @api.post("/setAD")
     def set_ad(df_id: str, model_id: str, data: DataModel):
         try:
-            if model_id == 'AdtkAD':
-                params = data.adtk_params.copy()
-                params[9] = (params[9], data.adtk_freq)
-                params[10] = (params[10], data.adtk_freq)
-                params[11] = (params[11], data.adtk_pca_k)
+            if model_id == 'DcvaeAD':
 
-                model = AdtkAD(data.adtk_id, params, data.nvot)
-                detectors.set_model(df_id, model)
-                detectors.set_all_obs_detect(df_id, True)
-            elif model_id == 'ExpAD':
-                df = pd.DataFrame(list(zip(data.values, data.metrics)),
-                                  columns=['values', 'metrics'], index=pd.to_datetime(data.index))
-                df = df.pivot(columns='metrics', values='values')
-                df = df.asfreq(data.freq)
-
-                model = ExpAD(th=1,
-                              df=df,
-                              model_type="Exp",
-                              seasonal=12,
-                              initialization_method='concentrated')
-                detectors.set_model(df_id, model)
-            elif model_id == 'SsmAD':
-                df = pd.DataFrame(list(zip(data.values, data.metrics)),
-                                  columns=['values', 'metrics'], index=pd.to_datetime(data.index))
-                df = df.pivot(columns='metrics', values='values')
-                df = df.asfreq(data.freq)
-
-                model = SsmAD(df=df,
-                              th_sigma=data.threshold,
+                model = DcvaeAD(th_sigma=data.threshold,
                               th_lower=data.th_lower,
-                              th_upper=data.th_upper,
-                              order=data.order,
-                              pre_log=data.pre_log,
-                              log_cnt=data.log_cnt
+                              th_upper=data.th_upper
                               )
                 detectors.set_model(df_id, model)
 
