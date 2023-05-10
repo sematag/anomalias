@@ -114,7 +114,7 @@ def MTS2UTS_cond(ds=None, T=32, seed=42):
     return samples_values, samples_info
 
 
-def samples2model(df=None):
+def samples2model(df=None, serie='AACallCostHome'):
 
     dict_series_embedd={'AACallCostHome': 1/1,	
             'AACallCountHome': 1/2,	
@@ -130,7 +130,7 @@ def samples2model(df=None):
             'GeoswitchPagosCount': 1/12
     }
 
-    serie_name = df.columns[0]
+    serie_name = serie
     if serie_name in dict_series_embedd.keys():
         col_embedd = dict_series_embedd[serie_name]
     else:

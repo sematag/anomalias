@@ -44,11 +44,10 @@ class Sampling(Layer):
 
 
 class DcvaeAD:
-    def __init__(self, th_sigma=1, th_lower=None, th_upper=None, 
+    def __init__(self, th_sigma=1, th_lower=None, th_upper=None, serie='AACallCostHome',
                  model_path='./anomalias/model_files/', 
                  model_name='dc_cvae_uni_best_model',
                  scaler_path='./anomalias/scaler_files/',
-                 scaler_filename='',
                  T=128,
                  batch_size=32,
                  epochs=100,
@@ -58,14 +57,14 @@ class DcvaeAD:
         self.__th_sigma = th_sigma
         self.__th_lower = th_lower
         self.__th_upper = th_upper
+        self.__serie = serie
 
         self.__T = T
         self.__batch_size = batch_size
         self.__epochs = epochs
-        self.__scaler = StandardScaler()
         self.__validation_split = validation_split
         self.__model_name = model_name
-        self.__scaler = scaler_path+scaler_filename+'.pkl'
+        self.__scaler = scaler_path+serie+'.pkl'
 
         logger.info('Model name: '+model_name)
         self.__model = None
@@ -93,7 +92,7 @@ class DcvaeAD:
         # Normalization
         df_norm = scaler01(df, self.__scaler, 'transform')
         
-        sam_val, sam_info = samples2model(df_norm)
+        sam_val, sam_info = samples2model(df_norm, serie)
         sam_val = np.expand_dims(sam_val, axis=0)
         sam_info = np.expand_dims(sam_info, axis=0)
         # Predictions

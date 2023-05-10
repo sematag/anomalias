@@ -49,20 +49,10 @@ class DataModel(BaseModel):
     values: list
     metrics: List[str]
     freq: str
-    # SSM params
     threshold: float = 4
-    order: list = (1, 1, 2)
     th_lower: float = None
     th_upper: float = None
-    pre_log: bool = False
-    log_cnt: int = 1
-    # Adtk params
-    adtk_id: list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    adtk_params: list = [0.00203, 0.00809, 8.7, 0.00102, 1.81, 0.98,
-                         6.56, 8.08, 0.44, 0.00101, 7.87, 16.9, 8.0]
-    adtk_freq: int = 288
-    adtk_pca_k: int = 1
-    nvot: int = 1
+    serie_name: str = 'AACallCostHome'
 
 
 class InfluxApi:
@@ -133,7 +123,8 @@ def init(detectors):
 
                 model = DcvaeAD(th_sigma=data.threshold,
                               th_lower=data.th_lower,
-                              th_upper=data.th_upper
+                              th_upper=data.th_upper,
+                              serie=data.serie_name
                               )
                 detectors.set_model(df_id, model)
 
