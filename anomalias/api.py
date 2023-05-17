@@ -127,6 +127,7 @@ def init(detectors):
                               serie=data.serie_name
                               )
                 detectors.set_model(df_id, model)
+                logger.debug('ERROR MODEL: %s', type(model))
 
             with open('state/' + df_id + '.model', 'w+') as file:
                 file.write(model_id)
