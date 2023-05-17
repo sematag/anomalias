@@ -32,6 +32,8 @@ influx_url = config.get("influx", "influx_url")
 timeout = config.get("influx", "timeout")
 port = int(config.get("influx", "port"))
 
+zbxcmd = "/usr/bin/zabbix_sender -c /etc/zabbix/zabbix_agentd.conf"
+
 logger.debug('%s:', influx_url)
 
 
@@ -95,6 +97,15 @@ class InfluxApi:
                 logger.debug('\n %s', df_out)
                 self.__write_api.write(bk, org, record=df_out, data_frame_measurement_name=measurement,
                                        data_frame_tag_columns=None)
+                # zabbix
+                zabbix_out = pd.DataFrame(0, index=df_out.index, columns=df_out.columns)
+                if metric in anomalies.columns:
+                    zabbix_out.loc[zabbix_out.index.isin(anomalies_out)] = 1
+
+                for index, row in zabbix_out.iterrows():
+                    logger.debug('Sending anomalies to zabbix\n %s', zbxcmd + " -k anomalias_" + metric + " -o " +
+                                 str(row['metric']) + " >> /dev/null")
+                    # os.system(zbxcmd + " -k anomalias_" + metric + " -o " + str(row['metric']) + " >> /dev/null")
 
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
                     anomaly_th_lower_out = anomaly_th_lower[metric].to_frame()
