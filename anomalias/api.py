@@ -100,7 +100,7 @@ class InfluxApi:
                 # zabbix
                 zabbix_out = pd.DataFrame(0, index=df_out.index, columns=df_out.columns)
                 if metric in anomalies.columns:
-                    zabbix_out.loc[zabbix_out.index.isin(anomalies_out)] = 1
+                    zabbix_out.loc[zabbix_out.index.isin(anomalies_out.index)] = 1
 
                 for index, row in zabbix_out.iterrows():
                     logger.debug('Sending anomalies to zabbix\n %s', zbxcmd + " -k anomalias_" + metric + " -o " +
