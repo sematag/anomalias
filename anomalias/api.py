@@ -104,8 +104,8 @@ class InfluxApi:
 
                 for index, row in zabbix_out.iterrows():
                     logger.debug('Sending anomalies to zabbix\n %s', zbxcmd + " -k anomalias_" + metric + " -o " +
-                                 str(row['metric']) + " >> /dev/null")
-                    # os.system(zbxcmd + " -k anomalias_" + metric + " -o " + str(row['metric']) + " >> /dev/null")
+                                 str(row[metric]) + " >> /dev/null")
+                    # os.system(zbxcmd + " -k anomalias_" + metric + " -o " + str(row[metric]) + " >> /dev/null")
 
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
                     anomaly_th_lower_out = anomaly_th_lower[metric].to_frame()
