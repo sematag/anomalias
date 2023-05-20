@@ -36,8 +36,6 @@ port = int(config.get("influx", "port"))
 
 logger.debug('%s:', influx_url)
 
-zbx_server = ZabbixSender('10.24.181.234', 10050)
-
 
 class DataFrame(BaseModel):
     index: list
@@ -73,6 +71,7 @@ class InfluxApi:
         self.__client = InfluxDBClient(url=influx_url, token=token, org=org, timeout=timeout)
         self.__write_api = self.__client.write_api()
         self.__delete_api = self.__client.delete_api()
+        self.__zbx_server = ZabbixSender('10.24.181.234', 10050)
 
     def delete(self, measurement):
         self.__delete_api.delete("1970-01-01T00:00:00Z", "2073-01-01T00:00:00Z", '_measurement="' + measurement + '"',  bucket=bucket_train, org=org)
@@ -110,7 +109,7 @@ class InfluxApi:
                         logger.debug('Sending anomalies to zabbix')
                         packet = ZabbixPacket()
                         packet.add('anomalias', str(metric), str(row[metric]))
-                        zbx_server.send(packet)
+                        self.__zbx_server.send(packet)
 
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
                     anomaly_th_lower_out = anomaly_th_lower[metric].to_frame()
