@@ -53,7 +53,7 @@ class DataModel(BaseModel):
     # SSM params
     threshold: float = 4
     order: list = (1, 1, 2)
-    th_lower: float = None
+    th_lower: float = 0
     th_upper: float = None
     pre_log: bool = False
     log_cnt: int = 1
