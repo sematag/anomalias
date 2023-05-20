@@ -3,6 +3,8 @@ import anomalias.log as log
 
 import pandas as pd
 import os
+import subprocess
+
 import pickle
 
 from influxdb_client import InfluxDBClient
@@ -31,8 +33,6 @@ bucket_train = config.get("influx", "bucket_train")
 influx_url = config.get("influx", "influx_url")
 timeout = config.get("influx", "timeout")
 port = int(config.get("influx", "port"))
-
-zbxcmd = "/usr/bin/zabbix_sender -c /etc/zabbix/zabbix_agentd.conf"
 
 logger.debug('%s:', influx_url)
 
@@ -105,9 +105,9 @@ class InfluxApi:
                         zabbix_out.loc[zabbix_out.index.isin(anomalies_out.index)] = 1
 
                     for index, row in zabbix_out.iterrows():
-                        logger.debug('Sending anomalies to zabbix\n %s', zbxcmd + " -k anomalias_" + metric + " -o " +
-                                     str(row[metric]) + " >> /dev/null")
-                        os.system(zbxcmd + " -k anomalias_" + metric + " -o " + str(row[metric]) + " >> /dev/null")
+                        logger.debug('Sending anomalies to zabbix')
+                        subprocess.run(["/usr/bin/zabbix_sender", "-c /etc/zabbix/zabbix_agentd.conf -k anomalias_"
+                                        + metric + " -o " + str(row[metric]), "/dev/null"])
 
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
                     anomaly_th_lower_out = anomaly_th_lower[metric].to_frame()
