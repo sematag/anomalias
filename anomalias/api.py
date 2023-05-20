@@ -96,7 +96,7 @@ class InfluxApi:
 
                 logger.debug('api.py: data to write (measurement %s):', measurement)
                 logger.debug('\n %s', df_out)
-                self.__write_api.write(bk, org, record=df_out.astype(float), data_frame_measurement_name=measurement,
+                self.__write_api.write(bk, org, record=df_out, data_frame_measurement_name=measurement,
                                        data_frame_tag_columns=None)
 
                 if not train and zbx_alert:
