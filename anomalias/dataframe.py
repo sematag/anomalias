@@ -7,7 +7,7 @@ logger = log.logger('Series')
 
 
 class DataFrame(Thread):
-    def __init__(self, df_id, df_len, api, zbx_alert=False):
+    def __init__(self, df_id, df_len, api, zbx_alert=True):
         Thread.__init__(self, name=df_id)
         self.id = df_id
         self.ad = detector.Detector(df_len=df_len)

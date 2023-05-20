@@ -9,7 +9,7 @@ class Detectors:
         self.__dataframes = []
         self.__df_id = []
 
-    def add(self, df_id, df_len, api, zbx_alert=False):
+    def add(self, df_id, df_len, api, zbx_alert=True):
         try:
             if not self.__exist_id(df_id):
                 self.__dataframes.append(dataframe.DataFrame(df_id=df_id, df_len=df_len, api=api, zbx_alert=zbx_alert))
