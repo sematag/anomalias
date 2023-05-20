@@ -75,7 +75,7 @@ class InfluxApi:
     def delete(self, measurement):
         self.__delete_api.delete("1970-01-01T00:00:00Z", "2073-01-01T00:00:00Z", '_measurement="' + measurement + '"',  bucket=bucket_train, org=org)
 
-    def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement, train=False):
+    def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement, train=False, zbx_alert=False):
         if train:
             bk = str(bucket_train)
         else:
@@ -98,7 +98,7 @@ class InfluxApi:
                 self.__write_api.write(bk, org, record=df_out, data_frame_measurement_name=measurement,
                                        data_frame_tag_columns=None)
 
-                if not train:
+                if not train and zbx_alert:
                     # zabbix
                     zabbix_out = pd.DataFrame(0, index=df_out.index, columns=df_out.columns)
                     if metric in anomalies.columns:
@@ -107,7 +107,7 @@ class InfluxApi:
                     for index, row in zabbix_out.iterrows():
                         logger.debug('Sending anomalies to zabbix\n %s', zbxcmd + " -k anomalias_" + metric + " -o " +
                                      str(row[metric]) + " >> /dev/null")
-                        # os.system(zbxcmd + " -k anomalias_" + metric + " -o " + str(row[metric]) + " >> /dev/null")
+                        os.system(zbxcmd + " -k anomalias_" + metric + " -o " + str(row[metric]) + " >> /dev/null")
 
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
                     anomaly_th_lower_out = anomaly_th_lower[metric].to_frame()
@@ -128,10 +128,10 @@ def init(detectors):
     api = FastAPI()
 
     @api.post("/newTS")
-    def new_ts(df_len: int, df_id: str):
+    def new_ts(df_len: int, df_id: str, zbx_alert: bool = False):
         try:
             influx_api = InfluxApi()
-            res = detectors.add(df_len=df_len, df_id=df_id, api=influx_api)
+            res = detectors.add(df_len=df_len, df_id=df_id, api=influx_api, zbx_alert=zbx_alert)
 
             return res
         except Exception as e:
