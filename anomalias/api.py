@@ -3,7 +3,7 @@ import anomalias.log as log
 
 import pandas as pd
 import os
-import subprocess
+from ZabbixSender import ZabbixSender, ZabbixPacket
 
 import pickle
 
@@ -35,6 +35,8 @@ timeout = config.get("influx", "timeout")
 port = int(config.get("influx", "port"))
 
 logger.debug('%s:', influx_url)
+
+zbx_server = ZabbixSender('10.24.181.234', 10050)
 
 
 class DataFrame(BaseModel):
@@ -106,8 +108,9 @@ class InfluxApi:
 
                     for index, row in zabbix_out.iterrows():
                         logger.debug('Sending anomalies to zabbix')
-                        subprocess.run(["/usr/bin/zabbix_sender", "-c /etc/zabbix/zabbix_agentd.conf -k anomalias_"
-                                        + metric + " -o " + str(row[metric]), "/dev/null"])
+                        packet = ZabbixPacket()
+                        packet.add('anomalias', str(metric), str(row[metric]))
+                        zbx_server.send(packet)
 
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
                     anomaly_th_lower_out = anomaly_th_lower[metric].to_frame()
