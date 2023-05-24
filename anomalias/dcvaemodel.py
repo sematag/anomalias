@@ -92,7 +92,7 @@ class DcvaeAD:
         # Normalization
         df_norm = scaler01(df, self.__scaler, 'transform')
         
-        sam_val, sam_info = samples2model(df_norm, serie)
+        sam_val, sam_info = samples2model(df_norm, self.__serie)
         sam_val = np.expand_dims(sam_val, axis=0)
         sam_info = np.expand_dims(sam_info, axis=0)
         # Predictions
