@@ -64,7 +64,7 @@ class DcvaeAD:
         self.__epochs = epochs
         self.__validation_split = validation_split
         self.__model_name = model_name
-        self.__scaler = scaler_path+serie+'.pkl'
+        self.__scaler = scaler_path+serie+'_scaler.pkl'
 
         logger.info('Model name: '+model_name)
         self.__model = None
