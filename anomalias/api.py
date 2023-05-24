@@ -45,10 +45,6 @@ class DataFrame(BaseModel):
 
 class DataModel(BaseModel):
     # Base params
-    index: list
-    values: list
-    metrics: List[str]
-    freq: str
     threshold: float = 4
     th_lower: float = None
     th_upper: float = None
@@ -126,7 +122,9 @@ def init(detectors):
                               th_upper=data.th_upper,
                               serie=data.serie_name
                               )
+                
                 detectors.set_model(df_id, model)
+                logger.debug('ERROR MODEL: %s', type(model))
 
             with open('state/' + df_id + '.model', 'w+') as file:
                 file.write(model_id)
