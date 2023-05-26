@@ -124,6 +124,7 @@ def init(detectors):
                               )
                 
                 detectors.set_model(df_id, model)
+                detectors.set_all_obs_detect(df_id, True)
                 logger.debug('ERROR MODEL: %s', type(model))
 
             with open('state/' + df_id + '.model', 'w+') as file:
