@@ -130,7 +130,7 @@ class DcvaeAD:
         # else:
         #     anomaly_th_upper.clip(upper=np.nanmax(anomaly_th_upper[anomaly_th_upper != np.inf]), inplace=True)
 
-        idx_anomaly = (df[-1:] > anomaly_th_upper) | (df[-1:] < anomaly_th_lower)
+        idx_anomaly = (df > anomaly_th_upper) | (df < anomaly_th_lower)
 
         return idx_anomaly, anomaly_th_lower, anomaly_th_upper
         
