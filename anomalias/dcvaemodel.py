@@ -114,8 +114,8 @@ class DcvaeAD:
         predicted_sigma = scaler01(predicted_sigma, self.__scaler, 'inverse')
 
         #Only the newest predictions are taken
-        predicted_mean = predicted_mean[-1:]
-        predicted_sigma = predicted_sigma[-1:]
+        #predicted_mean = predicted_mean[-1:]
+        #predicted_sigma = predicted_sigma[-1:]
         
         anomaly_th_lower = predicted_mean - self.__th_sigma * predicted_sigma
         anomaly_th_upper = predicted_mean + self.__th_sigma * predicted_sigma
