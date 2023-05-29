@@ -71,7 +71,7 @@ class InfluxApi:
         self.__client = InfluxDBClient(url=influx_url, token=token, org=org, timeout=timeout)
         self.__write_api = self.__client.write_api()
         self.__delete_api = self.__client.delete_api()
-        self.__zbx_api = ZabbixSender(zabbix_server='10.24.181.234', zabbix_port =10051)
+        self.__zbx_api = ZabbixSender(zabbix_server='10.24.181.234', zabbix_port=10051)
 
     def delete(self, measurement):
         self.__delete_api.delete("1970-01-01T00:00:00Z", "2073-01-01T00:00:00Z", '_measurement="' + measurement + '"',  bucket=bucket_train, org=org)
