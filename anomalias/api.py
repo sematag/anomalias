@@ -3,7 +3,7 @@ import anomalias.log as log
 
 import pandas as pd
 import os
-from ZabbixSender import ZabbixSender, ZabbixPacket
+from pyzabbix import ZabbixMetric, ZabbixSender
 
 import pickle
 
@@ -71,7 +71,7 @@ class InfluxApi:
         self.__client = InfluxDBClient(url=influx_url, token=token, org=org, timeout=timeout)
         self.__write_api = self.__client.write_api()
         self.__delete_api = self.__client.delete_api()
-        self.__zbx_server = ZabbixSender('10.24.181.234', 10051)
+        self.__zbx_api = ZabbixSender(zabbix_server = '10.24.181.234', zabbix_port =10051)
 
     def delete(self, measurement):
         self.__delete_api.delete("1970-01-01T00:00:00Z", "2073-01-01T00:00:00Z", '_measurement="' + measurement + '"',  bucket=bucket_train, org=org)
@@ -105,11 +105,11 @@ class InfluxApi:
                     if metric in anomalies.columns:
                         zabbix_out.loc[zabbix_out.index.isin(anomalies_out.index)] = 1
 
+                    packet = []
                     for index, row in zabbix_out.iterrows():
                         logger.debug('Sending anomalies to zabbix')
-                        packet = ZabbixPacket()
-                        packet.add('influx2-maq', 'PruebaTrap', '0')
-                        self.__zbx_server.send(packet)
+                        packet.add(ZabbixMetric('influx2-maq', 'PruebaTrap', '__'+str(index)))
+                    self.__zbx_api.send(packet)
 
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
                     anomaly_th_lower_out = anomaly_th_lower[metric].to_frame()
