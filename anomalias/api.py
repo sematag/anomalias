@@ -70,6 +70,9 @@ class InfluxApi:
             for metric in df:
                 df_out = df[metric].to_frame()
 
+                logger.debug('anomalies:\n %s', anomalies)
+                logger.debug('anomalies:\n %s', anomaly_th_upper)
+                logger.debug('anomalies:\n %s', anomaly_th_lower)
                 if metric in anomalies.columns:
                     anomalies_out = anomalies[metric]
                     anomalies_out = anomalies[anomalies_out].rename(columns={metric: 'anomaly'}).astype(int)
@@ -125,7 +128,6 @@ def init(detectors):
                 
                 detectors.set_model(df_id, model)
                 detectors.set_all_obs_detect(df_id, True)
-                logger.debug('ERROR MODEL: %s', type(model))
 
             with open('state/' + df_id + '.model', 'w+') as file:
                 file.write(model_id)
