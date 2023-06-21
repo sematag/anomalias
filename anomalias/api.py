@@ -33,6 +33,9 @@ bucket_train = config.get("influx", "bucket_train")
 influx_url = config.get("influx", "influx_url")
 timeout = config.get("influx", "timeout")
 port = int(config.get("influx", "port"))
+zbx_server = int(config.get("zabbix", "zabbix_server"))
+zbx_port = int(config.get("zabbix", "zabbix_port"))
+
 
 logger.debug('%s:', influx_url)
 
@@ -65,18 +68,18 @@ class DataModel(BaseModel):
     adtk_pca_k: int = 1
     nvot: int = 1
 
-
 class InfluxApi:
     def __init__(self):
         self.__client = InfluxDBClient(url=influx_url, token=token, org=org, timeout=timeout)
         self.__write_api = self.__client.write_api()
         self.__delete_api = self.__client.delete_api()
-        self.__zbx_api = ZabbixSender(zabbix_server='10.24.181.234', zabbix_port=10051)
+        self.__zbx_api = ZabbixSender(zabbix_server=zbx_server, zabbix_port=zbx_port)
 
     def delete(self, measurement):
         self.__delete_api.delete("1970-01-01T00:00:00Z", "2073-01-01T00:00:00Z", '_measurement="' + measurement + '"',  bucket=bucket_train, org=org)
 
-    def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement, train=False, zbx_alert=True):
+    def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement, train=False, zbx_alert=False,
+              zbx_hostname="anomalias"):
         if train:
             bk = str(bucket_train)
         else:
@@ -108,7 +111,7 @@ class InfluxApi:
                     packet = []
                     for index, row in zabbix_out.iterrows():
                         logger.debug('Sending anomalies to zabbix')
-                        packet.append(ZabbixMetric('influx2-maq', measurement+'_'+metric, row[metric]))
+                        packet.append(ZabbixMetric(zbx_hostname, measurement+'_'+metric, row[metric]))
                     self.__zbx_api.send(packet)
 
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
@@ -130,10 +133,14 @@ def init(detectors):
     api = FastAPI()
 
     @api.post("/newTS")
-    def new_ts(df_len: int, df_id: str, zbx_alert: bool = True):
+    def new_ts(df_len: int, df_id: str, zbx_host: str = 'anomalias'):
         try:
             influx_api = InfluxApi()
-            res = detectors.add(df_len=df_len, df_id=df_id, api=influx_api, zbx_alert=zbx_alert)
+            res = detectors.add(df_len=df_len, df_id=df_id, api=influx_api, zbx_host=zbx_host)
+
+            with open('state/' + df_id + '.model', 'w+') as file:
+                file.writelines([zbx_host+'\n', df_len+'\n'])
+                file.close()
 
             return res
         except Exception as e:
@@ -181,7 +188,7 @@ def init(detectors):
                 detectors.set_model(df_id, model)
 
             with open('state/' + df_id + '.model', 'w+') as file:
-                file.write(model_id)
+                file.writelines(model_id+'\n')
                 file.close()
 
             with open('state/'+df_id+'_DataModel.pkl', 'wb') as file:
@@ -267,6 +274,10 @@ def init(detectors):
     def list_ad():
         return detectors.active_ad()
 
+    @api.get("/zabbix_notification")
+    def zabbix_notification(df_id: str, notification: bool):
+        return detectors.zbx_notification(df_id, notification)
+
     # Read system state
     try:
         with open('state/state.ini') as file:
@@ -276,7 +287,7 @@ def init(detectors):
             for metric in metrics:
                 logger.debug('Read system state (metric %s):', metric)
                 with open('state/' + metric + '.model') as file:
-                    model = file.read()
+                    model = file.readlines()
                     file.close()
 
                 with open('state/' + metric + '_DataModel.pkl', 'rb') as file:
@@ -287,8 +298,8 @@ def init(detectors):
                     dat_frame = pickle.load(file)
                     file.close()
 
-                new_ts(15, metric)
-                set_ad(metric, model, dat_model)
+                new_ts(int(model[1].strip()), metric, model[0].strip())
+                set_ad(metric, model[2].strip(), dat_model)
                 fit(metric, dat_frame)
                 start_ad(metric)
     except Exception as e:

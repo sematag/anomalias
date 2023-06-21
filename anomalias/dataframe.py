@@ -7,7 +7,7 @@ logger = log.logger('Series')
 
 
 class DataFrame(Thread):
-    def __init__(self, df_id, df_len, api, zbx_alert=True):
+    def __init__(self, df_id, df_len, api, zbx_host):
         Thread.__init__(self, name=df_id)
         self.id = df_id
         self.ad = detector.Detector(df_len=df_len)
@@ -16,7 +16,8 @@ class DataFrame(Thread):
         self.__paused = False
         self.__observations = queue.Queue()
         self.__api = api
-        self.__zbx_alert = zbx_alert
+        self.__zbx_alert = True
+        self.__zbx_host = zbx_host
 
         logger.info('New series created, id %s', self.id)
 
@@ -37,7 +38,7 @@ class DataFrame(Thread):
                     logger.debug('\n %s', anomalies)
 
                     self.__api.write(df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement=self.id,
-                                     zbx_alert=self.__zbx_alert)
+                                     zbx_alert=self.__zbx_alert, zbx_host=self.__zbx_host)
 
                 except Exception as e:
                     logger.error('%s', e, exc_info=True)
