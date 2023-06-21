@@ -33,7 +33,7 @@ bucket_train = config.get("influx", "bucket_train")
 influx_url = config.get("influx", "influx_url")
 timeout = config.get("influx", "timeout")
 port = int(config.get("influx", "port"))
-zbx_server = int(config.get("zabbix", "zabbix_server"))
+zbx_server = config.get("zabbix", "zabbix_server")
 zbx_port = int(config.get("zabbix", "zabbix_port"))
 
 
