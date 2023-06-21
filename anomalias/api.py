@@ -187,7 +187,7 @@ def init(detectors):
                               )
                 detectors.set_model(df_id, model)
 
-            with open('state/' + df_id + '.model', 'a+') as file:
+            with open('state/' + df_id + '.model', 'a') as file:
                 file.writelines(model_id+'\n')
                 file.close()
 
