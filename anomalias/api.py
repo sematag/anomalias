@@ -79,7 +79,7 @@ class InfluxApi:
         self.__delete_api.delete("1970-01-01T00:00:00Z", "2073-01-01T00:00:00Z", '_measurement="' + measurement + '"',  bucket=bucket_train, org=org)
 
     def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement, train=False, zbx_alert=False,
-              zbx_hostname="anomalias"):
+              zbx_host="anomalias"):
         if train:
             bk = str(bucket_train)
         else:
@@ -111,7 +111,7 @@ class InfluxApi:
                     packet = []
                     for index, row in zabbix_out.iterrows():
                         logger.debug('Sending anomalies to zabbix')
-                        packet.append(ZabbixMetric(zbx_hostname, measurement+'_'+metric, row[metric]))
+                        packet.append(ZabbixMetric(zbx_host, measurement+'_'+metric, row[metric]))
                     self.__zbx_api.send(packet)
 
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
