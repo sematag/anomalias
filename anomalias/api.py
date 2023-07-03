@@ -61,9 +61,9 @@ class DataModel(BaseModel):
     pre_log: bool = False
     log_cnt: int = 1
     # Adtk params
-    adtk_id: list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    adtk_id: list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     adtk_params: list = [0.00203, 0.00809, 8.7, 0.00102, 1.81, 0.98,
-                         6.56, 8.08, 0.44, 0.00101, 7.87, 16.9, 8.0]
+                         6.56, 8.08, 0.44, 0.00101, 7.87, 8.0]
     adtk_freq: int = 288
     adtk_pca_k: int = 1
     nvot: int = 1
@@ -154,8 +154,7 @@ def init(detectors):
                 params = data.adtk_params.copy()
                 params[8] = (params[8], data.adtk_freq)
                 params[9] = (params[9], data.adtk_freq)
-                params[10] = (params[10], data.adtk_freq)
-                params[11] = (params[11], data.adtk_pca_k)
+                params[10] = (params[10], data.adtk_pca_k)
 
                 model = AdtkAD(data.adtk_id, params, data.nvot)
                 detectors.set_model(df_id, model)
