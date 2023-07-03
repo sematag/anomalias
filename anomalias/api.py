@@ -152,6 +152,7 @@ def init(detectors):
         try:
             if model_id == 'AdtkAD':
                 params = data.adtk_params.copy()
+                params[8] = (params[8], data.adtk_freq)
                 params[9] = (params[9], data.adtk_freq)
                 params[10] = (params[10], data.adtk_freq)
                 params[11] = (params[11], data.adtk_pca_k)
