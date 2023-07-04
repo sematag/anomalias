@@ -90,7 +90,7 @@ class AdtkAD:
         logger.info('Fitting model.')
         self.__df_train = train_data
         for i, detector in enumerate(self.__model):
-            logger.debug('Fit Adtk id: %s.', i)
+            logger.debug('Fit Adtk id: %s.', self.__model_id[i])
             self.__model[i].fit(train_data)
 
     def detect(self, observations):
