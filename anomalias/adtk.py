@@ -12,7 +12,7 @@ from adtk.aggregator import *
 from adtk.pipe import Pipeline, Pipenet
 import numpy as np
 
-nro_detectores = 15
+nAD = 12
 
 logger = log.logger('adtk')
 
@@ -53,10 +53,9 @@ def detector_7(param=3.0):
 
 # Seasonal - Regression
 def detector_8(params):
-    eps = params[0]
     steps2 = [
         ("ETS", ClassicSeasonalDecomposition(freq=params[1])),
-        ("quantile_ad", QuantileAD(high=1.0 - eps, low=eps))
+        ("InterQuartile", InterQuartileRangeAD(c=params[0]))
     ]
     return Pipeline(steps2)
 
