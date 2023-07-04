@@ -18,36 +18,36 @@ logger = log.logger('adtk')
 
 
 # OutlierDetector
-def detector_0(param=0.05):
+def detector_0(param=0.0001):
     return OutlierDetector(LocalOutlierFactor(contamination=param))
 
 
-def detector_1(param=0.05):
+def detector_1(param=0.0001):
     return OutlierDetector(IsolationForest(contamination=param, warm_start=True))
 
 
-def detector_2(param=5):
+def detector_2(param=1.0):
     return InterQuartileRangeAD(c=param)
 
 
-def detector_3(param=0.01):
+def detector_3(param=0.001):
     return QuantileAD(high=1-param, low=param)
 
 
-def detector_4(param=0.01):
+def detector_4(param=5.0):
     return GeneralizedESDTestAD(alpha=param)
 
 
 # Point/Level/Volatility Change
-def detector_5(param=0.1):
+def detector_5(param=8.0):
     return PersistAD(c=param)
 
 
-def detector_6(param=3.0):
+def detector_6(param=5.0):
     return LevelShiftAD(c=param, side='both', window=5)
 
 
-def detector_7(param=3.0):
+def detector_7(param=6.0):
     return VolatilityShiftAD(c=param, side='negative', window=5)
 
 

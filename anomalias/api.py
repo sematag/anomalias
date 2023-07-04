@@ -62,8 +62,8 @@ class DataModel(BaseModel):
     log_cnt: int = 1
     # Adtk params
     adtk_id: list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-    adtk_params: list = [0.00203, 0.00809, 8.7, 0.00102, 1.81, 0.98,
-                         6.56, 8.08, 0.44, 0.00101, 7.87, 8.0]
+    adtk_params: list = [0.0001, 0.0001, 1.0, 0.001, 5.0, 8.0,
+                         5.0, 5.0, 3.0, 3.0, 3.0, 20.0]
     adtk_freq: int = 288
     adtk_pca_k: int = 1
     nvot: int = 1
