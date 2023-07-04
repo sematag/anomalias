@@ -55,3 +55,6 @@ class DataFrame(Thread):
 
     def resume(self):
         self.__paused = False
+
+    def set_zbx_notification(self, bol: bool):
+        self.__zbx_alert = bol

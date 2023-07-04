@@ -106,6 +106,6 @@ class Detectors:
     def zbx_notification(self, df_id, bol):
         try:
             if self.__exist_id(df_id):
-                (self.__dataframes[self.__df_id.index(df_id)]).__zbx_alert = bol
+                (self.__dataframes[self.__df_id.index(df_id)]).set_zbx_notification(bol)
         except Exception as e:
             logger.error('%s', e)
