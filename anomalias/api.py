@@ -276,7 +276,7 @@ def init(detectors):
 
     @api.get("/zabbix_notification")
     def zabbix_notification(df_id: str, notification: bool):
-        return detectors.zbx_notification(df_id, notification)
+        return detectors.zbx_notification(df_id, notification == "true")
 
     # Read system state
     try:
