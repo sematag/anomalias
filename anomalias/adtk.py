@@ -83,6 +83,7 @@ class AdtkAD:
         self.__df_train = []
         logger.info('Creating ADTK model.')
         self.__model = [detector_lst[i](params[i]) for i in models_idx]
+        self.__model_id = models_idx
         self.__nvot = nvot
 
     def fit(self, train_data):
@@ -95,7 +96,7 @@ class AdtkAD:
     def detect(self, observations):
 
         for i, detector in enumerate(self.__model):
-            logger.debug('Detect Adtk id: %s.', i)
+            logger.debug('Detect Adtk id: %s.', self.__model_id[i])
             anom = self.__model[i].detect(observations)
             anom.index.rename('_time', inplace=True)
 
