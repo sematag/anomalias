@@ -129,6 +129,7 @@ class AdtkAD:
         idx_anomaly.index.rename(observations.index.name, inplace=True)
 
         idx_anomaly = idx_anomaly.pivot(columns='series', values='anomaly')
+        idx_anomaly.fillna(False, inplace=True)
 
         anomaly_th_lower = None
         anomaly_th_upper = None
