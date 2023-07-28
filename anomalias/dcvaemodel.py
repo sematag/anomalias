@@ -64,7 +64,7 @@ class DcvaeAD:
         self.__epochs = epochs
         self.__validation_split = validation_split
         self.__model_name = model_name
-        self.__scaler = scaler_path+serie+'.pkl'
+        self.__scaler = scaler_path+serie+'_scaler.pkl'
 
         logger.info('Model name: '+model_name)
         self.__model = None
@@ -92,7 +92,7 @@ class DcvaeAD:
         # Normalization
         df_norm = scaler01(df, self.__scaler, 'transform')
         
-        sam_val, sam_info = samples2model(df_norm, serie)
+        sam_val, sam_info = samples2model(df_norm, self.__serie)
         sam_val = np.expand_dims(sam_val, axis=0)
         sam_info = np.expand_dims(sam_info, axis=0)
         # Predictions
@@ -114,8 +114,8 @@ class DcvaeAD:
         predicted_sigma = scaler01(predicted_sigma, self.__scaler, 'inverse')
 
         #Only the newest predictions are taken
-        predicted_mean = predicted_mean[-1:]
-        predicted_sigma = predicted_sigma[-1:]
+        #predicted_mean = predicted_mean[-1:]
+        #predicted_sigma = predicted_sigma[-1:]
         
         anomaly_th_lower = predicted_mean - self.__th_sigma * predicted_sigma
         anomaly_th_upper = predicted_mean + self.__th_sigma * predicted_sigma
@@ -130,7 +130,7 @@ class DcvaeAD:
         # else:
         #     anomaly_th_upper.clip(upper=np.nanmax(anomaly_th_upper[anomaly_th_upper != np.inf]), inplace=True)
 
-        idx_anomaly = (df[-1:] > anomaly_th_upper) | (df[-1:] < anomaly_th_lower)
+        idx_anomaly = (df > anomaly_th_upper) | (df < anomaly_th_lower)
 
         return idx_anomaly, anomaly_th_lower, anomaly_th_upper
         
