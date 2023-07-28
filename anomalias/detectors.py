@@ -9,10 +9,10 @@ class Detectors:
         self.__dataframes = []
         self.__df_id = []
 
-    def add(self, df_id, df_len, api):
+    def add(self, df_id, df_len, api, zbx_host):
         try:
             if not self.__exist_id(df_id):
-                self.__dataframes.append(dataframe.DataFrame(df_id=df_id, df_len=df_len, api=api))
+                self.__dataframes.append(dataframe.DataFrame(df_id=df_id, df_len=df_len, api=api, zbx_host=zbx_host))
                 self.__df_id.append(df_id)
                 return "OK"
             else:
@@ -44,7 +44,13 @@ class Detectors:
             return "ERROR"
 
     def list_ad(self):
+        # List all detectors
         return self.__df_id
+
+    def active_ad(self):
+        # List running detectors
+        active_ad = [df_id for df_id in self.__df_id if self.__dataframes[self.__df_id.index(df_id)].is_alive()]
+        return active_ad
 
     def start(self, df_id):
         try:
@@ -96,4 +102,10 @@ class Detectors:
                 (self.__dataframes[self.__df_id.index(df_id)]).ad.set_all_obs_detect(bol)
         except Exception as e:
             logger.error('%s', e)
-            return None
+
+    def zbx_notification(self, df_id, bol):
+        try:
+            if self.__exist_id(df_id):
+                (self.__dataframes[self.__df_id.index(df_id)]).set_zbx_notification(bol)
+        except Exception as e:
+            logger.error('%s', e)
