@@ -278,7 +278,7 @@ def init(detectors):
     @api.post("/detect")
     def detect(df_id: str, data: DataFrame):
         try:
-            print(data.head())
+            print(data.columns)
 
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
                               columns=['values', 'metrics'], index=pd.to_datetime(data.index))
