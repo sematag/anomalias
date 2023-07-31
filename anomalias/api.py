@@ -278,6 +278,10 @@ def init(detectors):
     @api.post("/detect")
     def detect(df_id: str, data: DataFrame):
         try:
+            print("Print json ===========================")
+            for key, value in data.items():
+                print(key, ' : ', value)
+                
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
                               columns=['values', 'metrics'], index=pd.to_datetime(data.index))
             df = df.pivot(columns='metrics', values='values')
