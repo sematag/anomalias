@@ -148,6 +148,9 @@ def init(detectors):
             influx_api = InfluxApi()
             res = detectors.add(df_len=df_len, df_id=df_id, api=influx_api, zbx_host=zbx_host)
 
+            print("newTS PRINT DEBUGG")
+            print(res)
+
             with open('state/' + df_id + '.model', 'w+') as file:
                 file.writelines([zbx_host+'\n', str(df_len)+'\n'])
                 file.close()
