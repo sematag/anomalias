@@ -163,6 +163,7 @@ def init(detectors):
     @api.post("/setAD")
     def set_ad(df_id: str, model_id: str, data: DataModel):
         try:
+            print("ACAAAAAAA: ", model_id)
             if model_id == 'AdtkAD':
                 params = data.adtk_params.copy()
                 params[8] = (params[8], data.adtk_freq)
