@@ -14,6 +14,7 @@ model = DcvaeAD(scaler_filename='AACallCostHome_scaler')
 
 idx_anomaly, anomaly_th_lower, anomaly_th_upper = model.detect(dat)
 
+print(dir(model))
 print(idx_anomaly.head())
 print(anomaly_th_lower.head())
 print(anomaly_th_upper.head())

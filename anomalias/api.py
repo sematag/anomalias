@@ -206,7 +206,8 @@ def init(detectors):
                               th_upper=data.th_upper,
                               serie=data.serie_name
                               )
-                
+                print("MODELOOOOOOOOOOOOOOOOOOOOOOOOO")
+                print(dir(model))
                 detectors.set_model(df_id, model)
                 detectors.set_all_obs_detect(df_id, True)
 
