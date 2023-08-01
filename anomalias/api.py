@@ -144,6 +144,7 @@ def init(detectors):
 
     @api.post("/newTS")
     def new_ts(df_len: int, df_id: str, zbx_host: str = 'anomalias'):
+        print("ACAAAAAAA: ", df_len)
         try:
             influx_api = InfluxApi()
             res = detectors.add(df_len=df_len, df_id=df_id, api=influx_api, zbx_host=zbx_host)
