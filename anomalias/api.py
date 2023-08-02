@@ -285,7 +285,7 @@ def init(detectors):
             df = df.asfreq(data.freq)
 
             logger.debug('api.py: call to detect(), data:')
-            logger.debug('\n %s', df)
+            logger.debug('\n %s', df.isnull().sum())
 
             detectors.append(df_id, df)  # Detection
         except Exception as e:
