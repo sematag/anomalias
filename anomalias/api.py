@@ -50,10 +50,10 @@ class DataFrame(BaseModel):
 
 class DataModel(BaseModel):
     # Base params
-    index: list
-    values: list
-    metrics: List[str]
-    freq: str
+    index: list = None
+    values: list = None
+    metrics: List[str] = None
+    freq: str = None
     # SSM params
     threshold: float = 4
     order: list = (1, 1, 2)
@@ -144,13 +144,9 @@ def init(detectors):
 
     @api.post("/newTS")
     def new_ts(df_len: int, df_id: str, zbx_host: str = 'anomalias'):
-        print("ACAAAAAAA: ", df_len)
         try:
             influx_api = InfluxApi()
             res = detectors.add(df_len=df_len, df_id=df_id, api=influx_api, zbx_host=zbx_host)
-
-            print("newTS PRINT DEBUGG")
-            print(res)
 
             with open('state/' + df_id + '.model', 'w+') as file:
                 file.writelines([zbx_host+'\n', str(df_len)+'\n'])
@@ -164,7 +160,6 @@ def init(detectors):
     @api.post("/setAD")
     def set_ad(df_id: str, model_id: str, data: DataModel):
         try:
-            print("ACAAAAAAA: ", model_id)
             if model_id == 'AdtkAD':
                 params = data.adtk_params.copy()
                 params[8] = (params[8], data.adtk_freq)
@@ -174,6 +169,7 @@ def init(detectors):
                 model = AdtkAD(data.adtk_id, params, data.nvot)
                 detectors.set_model(df_id, model)
                 detectors.set_all_obs_detect(df_id, True)
+
             elif model_id == 'ExpAD':
                 df = pd.DataFrame(list(zip(data.values, data.metrics)),
                                   columns=['values', 'metrics'], index=pd.to_datetime(data.index))
@@ -186,6 +182,7 @@ def init(detectors):
                               seasonal=12,
                               initialization_method='concentrated')
                 detectors.set_model(df_id, model)
+
             elif model_id == 'SsmAD':
                 df = pd.DataFrame(list(zip(data.values, data.metrics)),
                                   columns=['values', 'metrics'], index=pd.to_datetime(data.index))
@@ -201,15 +198,13 @@ def init(detectors):
                               log_cnt=data.log_cnt
                               )
                 detectors.set_model(df_id, model)
-            elif model_id == 'DcvaeAD':
 
+            elif model_id == 'DcvaeAD':
                 model = DcvaeAD(th_sigma=data.threshold,
                               th_lower=data.th_lower,
                               th_upper=data.th_upper,
                               serie=data.serie_name
                               )
-                print("MODELOOOOOOOOOOOOOOOOOOOOOOOOO")
-                print(dir(model))
                 detectors.set_model(df_id, model)
                 detectors.set_all_obs_detect(df_id, True)
 
