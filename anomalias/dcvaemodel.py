@@ -97,7 +97,7 @@ class DcvaeAD:
         
         X = samples2model(df_X, T=self.__T)
         X = np.array(X)
-        X = np.expand_dims(X, axis=0)
+        #X = np.expand_dims(X, axis=0)
 
         # Predictions
         prediction = self.__model_fit(X)
