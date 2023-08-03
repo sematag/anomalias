@@ -251,7 +251,7 @@ def init(detectors):
     def fit(df_id: str, data: DataFrame):
         try:
             print(" APIIIIIIIi")
-            print(df)
+            print(data)
 
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
                               columns=['values', 'metrics'], index=pd.to_datetime(data.index))
