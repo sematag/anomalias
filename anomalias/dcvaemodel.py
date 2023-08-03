@@ -14,7 +14,7 @@ from tensorflow import keras
 import pandas as pd
 import numpy as np
 import pickle
-from anomalias.utils import scaler01, samples2model
+from anomalias.utils import MTS2UTS
 from sklearn.preprocessing import StandardScaler
 
 from anomalias import log
@@ -46,7 +46,7 @@ class Sampling(Layer):
 class DcvaeAD:
     def __init__(self, th_sigma=1, th_lower=None, th_upper=None, serie='AACallCostHome',
                  model_path='./anomalias/model_files/', 
-                 model_name='dc_cvae_uni_best_model',
+                 model_name='dc-vae_global_best_model',
                  scaler_path='./anomalias/scaler_files/',
                  T=128,
                  batch_size=32,
@@ -84,19 +84,22 @@ class DcvaeAD:
         Por ahora no creemos conveniente habilitar el entrenamiento para este método.
         Como mucho se podría hacer un ajuste para una nueva serie. Pero eso queda para más adelante.
         '''
+        self.param_norm = df.quantile(0.98)
+
         return self
          
     def detect(self, df):
         
         # Data preprocess
         # Normalization
-        df_norm = scaler01(df, self.__scaler, 'transform')
+        #df_norm = scaler01(df, self.__scaler, 'transform')
+        df_X = df/self.param_norm
         
-        sam_val, sam_info = samples2model(df_norm, self.__serie)
-        sam_val = np.expand_dims(sam_val, axis=0)
-        sam_info = np.expand_dims(sam_info, axis=0)
+        X, _, _ = MTS2UTS(df_X, T=self.T)
+        #sam_val = np.expand_dims(sam_val, axis=0)
+
         # Predictions
-        prediction = self.__model_fit((sam_val, sam_info))
+        prediction = self.__model_fit(X)
 
         predicted_mean_values = np.squeeze(prediction[0])
         predicted_sigma_values = np.squeeze(np.sqrt(np.exp(prediction[1])))
@@ -110,15 +113,12 @@ class DcvaeAD:
             predicted_mean = predicted_mean.to_frame()
             predicted_sigma = predicted_sigma.to_frame()
 
-        predicted_mean = scaler01(predicted_mean, self.__scaler, 'inverse')
-        predicted_sigma = scaler01(predicted_sigma, self.__scaler, 'inverse')
-
         #Only the newest predictions are taken
         #predicted_mean = predicted_mean[-1:]
         #predicted_sigma = predicted_sigma[-1:]
         
-        anomaly_th_lower = predicted_mean - self.__th_sigma * predicted_sigma
-        anomaly_th_upper = predicted_mean + self.__th_sigma * predicted_sigma
+        anomaly_th_lower = (predicted_mean - self.__th_sigma * predicted_sigma) * self.param_norm
+        anomaly_th_upper = (predicted_mean + self.__th_sigma * predicted_sigma) * self.param_norm
 
         # if self.__th_lower is not None:
         #     anomaly_th_lower.clip(lower=self.__th_lower, inplace=True)
