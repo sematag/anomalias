@@ -96,9 +96,8 @@ class DcvaeAD:
         df_X = df/self.param_norm
         
         X = samples2model(df_X, T=self.__T)
+        X = np.array(X)
         X = np.expand_dims(X, axis=0)
-
-        print('SHAPEEEE  ', X.shape)
 
         # Predictions
         prediction = self.__model_fit(X)

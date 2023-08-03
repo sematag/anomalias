@@ -87,4 +87,4 @@ def samples2model(df=None, T=128):
     values = df.values
     samples = [values[i: i + T] for i in range(0, N - T+1)]  
 
-    return samples[:, :, 0]
+    return samples
