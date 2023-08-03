@@ -81,3 +81,10 @@ def UTS2MTS(ds_val, ds_ix, ds_class):
             df[col] = ds_val[ds_class==col]
 
     return df
+
+def samples2model(df=None, T=128):
+    N=df.shape[0]
+    values = df.values
+    samples = [values[i: i + T] for i in range(0, N - T+1)]  
+
+    return samples

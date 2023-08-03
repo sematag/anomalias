@@ -14,7 +14,7 @@ from tensorflow import keras
 import pandas as pd
 import numpy as np
 import pickle
-from anomalias.utils import MTS2UTS
+from anomalias.utils import samples2model
 from sklearn.preprocessing import StandardScaler
 
 from anomalias import log
@@ -95,8 +95,8 @@ class DcvaeAD:
         #df_norm = scaler01(df, self.__scaler, 'transform')
         df_X = df/self.param_norm
         
-        X, _, _ = MTS2UTS(df_X, T=self.__T)
-        #sam_val = np.expand_dims(sam_val, axis=0)
+        X, _, _ = samples2model(df_X, T=self.__T)
+        X = np.expand_dims(X, axis=0)
 
         # Predictions
         prediction = self.__model_fit(X)
