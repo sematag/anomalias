@@ -96,6 +96,7 @@ class DcvaeAD:
         df_X = df/self.param_norm
         
         X = samples2model(df_X, T=self.__T)
+        X = np.transpose(X, (1,0,2))
 
         # Predictions
         prediction = self.__model_fit(X)
