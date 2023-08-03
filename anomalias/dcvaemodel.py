@@ -98,6 +98,8 @@ class DcvaeAD:
         X = samples2model(df_X, T=self.__T)
         X = np.transpose(X, (1,0,2))
 
+        print('SHAPEEEE  ', X.shape)
+
         # Predictions
         prediction = self.__model_fit(X)
 
