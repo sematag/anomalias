@@ -250,9 +250,6 @@ def init(detectors):
     @api.post("/fit")
     def fit(df_id: str, data: DataFrame):
         try:
-            print(" APIIIIIIIi")
-            print(data)
-
             df = pd.DataFrame(list(zip(data.values, data.metrics)),
                               columns=['values', 'metrics'], index=pd.to_datetime(data.index))
             df = df.pivot(columns='metrics', values='values')
