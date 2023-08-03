@@ -95,7 +95,7 @@ class DcvaeAD:
         #df_norm = scaler01(df, self.__scaler, 'transform')
         df_X = df/self.param_norm
         
-        X, _, _ = MTS2UTS(df_X, T=self.T)
+        X, _, _ = MTS2UTS(df_X, T=self.__T)
         #sam_val = np.expand_dims(sam_val, axis=0)
 
         # Predictions
