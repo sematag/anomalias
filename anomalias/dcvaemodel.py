@@ -116,23 +116,19 @@ class DcvaeAD:
         if isinstance(predicted_mean, pd.Series):
             predicted_mean = predicted_mean.to_frame()
             predicted_sigma = predicted_sigma.to_frame()
-
-        #Only the newest predictions are taken
-        #predicted_mean = predicted_mean[-1:]
-        #predicted_sigma = predicted_sigma[-1:]
         
         anomaly_th_lower = (predicted_mean - self.__th_sigma * predicted_sigma) * self.param_norm
         anomaly_th_upper = (predicted_mean + self.__th_sigma * predicted_sigma) * self.param_norm
 
-        # if self.__th_lower is not None:
-        #     anomaly_th_lower.clip(lower=self.__th_lower, inplace=True)
-        # else:
-        #     anomaly_th_lower.clip(lower=np.nanmin(anomaly_th_lower[anomaly_th_lower != -np.inf]), inplace=True)
+        if self.__th_lower is not None:
+            anomaly_th_lower.clip(lower=self.__th_lower, inplace=True)
+        else:
+            anomaly_th_lower.clip(lower=np.nanmin(anomaly_th_lower[anomaly_th_lower != -np.inf]), inplace=True)
 
-        # if self.__th_upper is not None:
-        #     anomaly_th_upper.clip(upper=self.__th_upper, inplace=True)
-        # else:
-        #     anomaly_th_upper.clip(upper=np.nanmax(anomaly_th_upper[anomaly_th_upper != np.inf]), inplace=True)
+        if self.__th_upper is not None:
+            anomaly_th_upper.clip(upper=self.__th_upper, inplace=True)
+        else:
+            anomaly_th_upper.clip(upper=np.nanmax(anomaly_th_upper[anomaly_th_upper != np.inf]), inplace=True)
 
         idx_anomaly = (df > anomaly_th_upper) | (df < anomaly_th_lower)
 
