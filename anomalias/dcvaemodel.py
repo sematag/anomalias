@@ -102,8 +102,11 @@ class DcvaeAD:
         # Predictions
         prediction = self.__model_fit(X)
 
-        predicted_mean_values = np.squeeze(prediction[0])
-        predicted_sigma_values = np.squeeze(np.sqrt(np.exp(prediction[1])))
+        predicted_mean_values = np.concatenate((prediction[0][0,:,:], prediction[0][1:,-1,:]))
+        predicted_sigma_values = np.concatenate((prediction[1][0,:,:], prediction[1][1:,-1,:]))
+
+        predicted_mean_values = np.squeeze(predicted_mean_values)
+        predicted_sigma_values = np.squeeze(np.sqrt(np.exp(predicted_sigma_values)))
 
         # Only the newest predictions are taken
         predicted_mean = pd.DataFrame(data=predicted_mean_values, index=df.index, 
