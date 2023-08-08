@@ -92,11 +92,13 @@ class InfluxApi:
                 if metric in anomalies.columns:
                     anomalies_out = anomalies[metric]
                     anomalies_out = (anomalies[anomalies_out].rename(columns={metric: 'anomaly'}).astype(int))[
-                        'anomaly'].to_frame()
+                        ['anomaly']]
+                    anomalies_out['tag'] = metric
                     logger.debug('api.py: anomalies to write (measurement %s):', measurement)
                     logger.debug('\n %s', anomalies_out)
-                    self.__write_api.write(bk, org, record=anomalies_out, data_frame_measurement_name=measurement,
-                                           data_frame_tag_columns=None)
+                    self.__write_api.write(bk, org, record=anomalies_out[['anomaly']],
+                                           data_frame_measurement_name=measurement,
+                                           data_frame_tag_columns=anomalies_out[['tag']])
 
                 logger.debug('api.py: data to write (measurement %s):', measurement)
                 logger.debug('\n %s', df_out)
