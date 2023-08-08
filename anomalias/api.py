@@ -96,7 +96,7 @@ class InfluxApi:
                     anomalies_out['tag'] = metric
                     logger.debug('api.py: anomalies to write (measurement %s):', measurement)
                     logger.debug('\n %s', anomalies_out)
-                    self.__write_api.write(bk, org, record=anomalies_out[['anomaly']],
+                    self.__write_api.write(bk, org, record=anomalies_out,
                                            data_frame_measurement_name=measurement,
                                            data_frame_tag_columns=['tag'])
 
