@@ -79,3 +79,6 @@ class Detector:
     def set_all_obs_detect(self, bol):
         self.__allObs = bol
 
+    def set_length(self, length: int):
+        self.__len = length
+

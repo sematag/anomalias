@@ -13,7 +13,6 @@ from pydantic import BaseModel
 
 from typing import List
 
-
 import nest_asyncio
 import uvicorn
 import configparser
@@ -35,7 +34,6 @@ timeout = config.get("influx", "timeout")
 port = int(config.get("influx", "port"))
 zbx_server = config.get("zabbix", "zabbix_server")
 zbx_port = int(config.get("zabbix", "zabbix_port"))
-
 
 logger.debug('%s:', influx_url)
 
@@ -68,6 +66,7 @@ class DataModel(BaseModel):
     adtk_pca_k: int = 1
     nvot: int = 1
 
+
 class InfluxApi:
     def __init__(self):
         self.__client = InfluxDBClient(url=influx_url, token=token, org=org, timeout=timeout)
@@ -76,7 +75,8 @@ class InfluxApi:
         self.__zbx_api = ZabbixSender(zabbix_server=zbx_server, zabbix_port=zbx_port)
 
     def delete(self, measurement):
-        self.__delete_api.delete("1970-01-01T00:00:00Z", "2073-01-01T00:00:00Z", '_measurement="' + measurement + '"',  bucket=bucket_train, org=org)
+        self.__delete_api.delete("1970-01-01T00:00:00Z", "2073-01-01T00:00:00Z", '_measurement="' + measurement + '"',
+                                 bucket=bucket_train, org=org)
 
     def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement, train=False, zbx_alert=False,
               zbx_host="anomalias"):
@@ -91,7 +91,8 @@ class InfluxApi:
 
                 if metric in anomalies.columns:
                     anomalies_out = anomalies[metric]
-                    anomalies_out = anomalies[anomalies_out].rename(columns={metric: 'anomaly'}).astype(int)
+                    anomalies_out = (anomalies[anomalies_out].rename(columns={metric: 'anomaly'}).astype(int))[
+                        'anomaly'].to_frame()
                     logger.debug('api.py: anomalies to write (measurement %s):', measurement)
                     logger.debug('\n %s', anomalies_out)
                     self.__write_api.write(bk, org, record=anomalies_out, data_frame_measurement_name=measurement,
@@ -111,7 +112,7 @@ class InfluxApi:
                     packet = []
                     for index, row in zabbix_out.iterrows():
                         logger.debug('Sending anomalies to zabbix')
-                        packet.append(ZabbixMetric(zbx_host, measurement+'_'+metric, row[metric]))
+                        packet.append(ZabbixMetric(zbx_host, measurement + '_' + metric, row[metric]))
                     self.__zbx_api.send(packet)
 
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
@@ -120,9 +121,11 @@ class InfluxApi:
                     anomaly_th_upper_out = anomaly_th_upper[metric].to_frame()
                     anomaly_th_upper_out = anomaly_th_upper_out.rename(columns={metric: 'anomalyThU'})
 
-                    self.__write_api.write(bk, org, record=anomaly_th_lower_out, data_frame_measurement_name=measurement,
+                    self.__write_api.write(bk, org, record=anomaly_th_lower_out,
+                                           data_frame_measurement_name=measurement,
                                            data_frame_tag_columns=None)
-                    self.__write_api.write(bk, org, record=anomaly_th_upper_out, data_frame_measurement_name=measurement,
+                    self.__write_api.write(bk, org, record=anomaly_th_upper_out,
+                                           data_frame_measurement_name=measurement,
                                            data_frame_tag_columns=None)
 
     def close(self):
@@ -139,7 +142,7 @@ def init(detectors):
             res = detectors.add(df_len=df_len, df_id=df_id, api=influx_api, zbx_host=zbx_host)
 
             with open('state/' + df_id + '.model', 'w+') as file:
-                file.writelines([zbx_host+'\n', str(df_len)+'\n'])
+                file.writelines([zbx_host + '\n', str(df_len) + '\n'])
                 file.close()
 
             return res
@@ -188,10 +191,10 @@ def init(detectors):
                 detectors.set_model(df_id, model)
 
             with open('state/' + df_id + '.model', 'a') as file:
-                file.writelines(model_id+'\n')
+                file.writelines(model_id + '\n')
                 file.close()
 
-            with open('state/'+df_id+'_DataModel.pkl', 'wb') as file:
+            with open('state/' + df_id + '_DataModel.pkl', 'wb') as file:
                 pickle.dump(data, file)
                 file.close()
 
@@ -278,6 +281,14 @@ def init(detectors):
     def zabbix_notification(df_id: str, notification: bool):
         return detectors.zbx_notification(df_id, notification == "true")
 
+    @api.post("/set_len")
+    def set_len(df_id: str, length: int):
+        return detectors.set_length(df_id, length)
+
+    @api.post("/set_zabbix_host")
+    def set_zabbix_host(df_id: str, zabbix_host: str = None):
+        return detectors.set_zbx_host(df_id, zabbix_host)
+
     # Read system state
     try:
         with open('state/state.ini') as file:
@@ -326,4 +337,3 @@ def init(detectors):
     cfg = uvicorn.Config(api, port=port, host="0.0.0.0", log_level="info")
     server = uvicorn.Server(cfg)
     server.run()
-

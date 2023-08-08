@@ -58,3 +58,6 @@ class DataFrame(Thread):
 
     def set_zbx_notification(self, bol: bool):
         self.__zbx_alert = bol
+
+    def set_zbx_host(self, zbx_host: str):
+        self.__zbx_host = zbx_host
