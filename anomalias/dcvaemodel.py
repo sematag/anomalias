@@ -44,27 +44,21 @@ class Sampling(Layer):
 
 
 class DcvaeAD:
-    def __init__(self, th_sigma=1, th_lower=None, th_upper=None, serie='AACallCostHome',
+    def __init__(self, th_sigma=1, th_lower=None, th_upper=None,
                  model_path='./anomalias/model_files/', 
                  model_name='dc-vae_global_best_model',
                  scaler_path='./anomalias/scaler_files/',
                  T=128,
-                 batch_size=32,
-                 epochs=100,
-                 validation_split=0.2,
-                   **kwargs):
+                 freq='5T'):
+        
         logger.info('Setting DCVAE model.')
         self.__th_sigma = th_sigma
         self.__th_lower = th_lower
         self.__th_upper = th_upper
-        self.__serie = serie
 
         self.__T = T
-        self.__batch_size = batch_size
-        self.__epochs = epochs
-        self.__validation_split = validation_split
+        self.__freq = freq
         self.__model_name = model_name
-        self.__scaler = scaler_path+serie+'_scaler.pkl'
 
         logger.info('Model name: '+model_name)
         self.__model = None
@@ -92,8 +86,9 @@ class DcvaeAD:
         
         # Data preprocess
         # Normalization
-        #df_norm = scaler01(df, self.__scaler, 'transform')
-        df_X = df/self.param_norm
+
+        df_X = df.asfreq(freq='5T', method='ffill')
+        df_X = df_X/self.param_norm
         
         X = samples2model(df_X, T=self.__T)
         X = np.array(X)
@@ -116,6 +111,10 @@ class DcvaeAD:
         if isinstance(predicted_mean, pd.Series):
             predicted_mean = predicted_mean.to_frame()
             predicted_sigma = predicted_sigma.to_frame()
+
+        predicted_mean = predicted_mean.asfreq(freq=self.__freq)
+        predicted_sigma = predicted_sigma.asfreq(freq=self.__freq)
+        
         
         anomaly_th_lower = (predicted_mean - self.__th_sigma * predicted_sigma) * self.param_norm
         anomaly_th_upper = (predicted_mean + self.__th_sigma * predicted_sigma) * self.param_norm

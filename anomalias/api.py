@@ -203,7 +203,8 @@ def init(detectors):
                 model = DcvaeAD(th_sigma=data.threshold,
                               th_lower=data.th_lower,
                               th_upper=data.th_upper,
-                              serie=data.serie_name
+                              serie=data.serie_name,
+                              freq = data.freq
                               )
                 detectors.set_model(df_id, model)
                 detectors.set_all_obs_detect(df_id, True)
