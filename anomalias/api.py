@@ -13,7 +13,6 @@ from pydantic import BaseModel
 
 from typing import List
 
-
 import nest_asyncio
 import uvicorn
 import configparser
@@ -36,7 +35,6 @@ timeout = config.get("influx", "timeout")
 port = int(config.get("influx", "port"))
 zbx_server = config.get("zabbix", "zabbix_server")
 zbx_port = int(config.get("zabbix", "zabbix_port"))
-
 
 logger.debug('%s:', influx_url)
 
@@ -83,7 +81,8 @@ class InfluxApi:
         self.__zbx_api = ZabbixSender(zabbix_server=zbx_server, zabbix_port=zbx_port)
 
     def delete(self, measurement):
-        self.__delete_api.delete("1970-01-01T00:00:00Z", "2073-01-01T00:00:00Z", '_measurement="' + measurement + '"',  bucket=bucket_train, org=org)
+        self.__delete_api.delete("1970-01-01T00:00:00Z", "2073-01-01T00:00:00Z", '_measurement="' + measurement + '"',  
+                                 bucket=bucket_train, org=org)
 
     def write(self, df, anomalies, anomaly_th_lower, anomaly_th_upper, measurement, train=False, zbx_alert=False,
               zbx_host="anomalias"):
@@ -101,7 +100,8 @@ class InfluxApi:
                 logger.debug('anomalies:\n %s', anomaly_th_lower)
                 if metric in anomalies.columns:
                     anomalies_out = anomalies[metric]
-                    anomalies_out = anomalies[anomalies_out].rename(columns={metric: 'anomaly'}).astype(int)
+                    anomalies_out = (anomalies[anomalies_out].rename(columns={metric: 'anomaly'}).astype(int))[
+                        'anomaly'].to_frame()
                     logger.debug('api.py: anomalies to write (measurement %s):', measurement)
                     logger.debug('\n %s', anomalies_out)
                     self.__write_api.write(bk, org, record=anomalies_out, data_frame_measurement_name=measurement,
@@ -299,6 +299,14 @@ def init(detectors):
     @api.get("/zabbix_notification")
     def zabbix_notification(df_id: str, notification: bool):
         return detectors.zbx_notification(df_id, notification == "true")
+    
+    @api.post("/set_len")
+    def set_len(df_id: str, length: int):
+        return detectors.set_length(df_id, length)
+
+    @api.post("/set_zabbix_host")
+    def set_zabbix_host(df_id: str, zabbix_host: str = None):
+        return detectors.set_zbx_host(df_id, zabbix_host)
 
     # Read system state
     try:

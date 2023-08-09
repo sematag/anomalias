@@ -109,3 +109,22 @@ class Detectors:
                 (self.__dataframes[self.__df_id.index(df_id)]).set_zbx_notification(bol)
         except Exception as e:
             logger.error('%s', e)
+
+ 
+    def set_zbx_host(self, df_id, zbx_host):
+        try:
+            if self.__exist_id(df_id):
+                (self.__dataframes[self.__df_id.index(df_id)]).set_zbx_host(zbx_host)
+            return "OK"
+        except Exception as e:
+            logger.error('%s', e)
+            return "ERROR"
+
+    def set_length(self, df_id, length: int):
+        try:
+            if self.__exist_id(df_id):
+                (self.__dataframes[self.__df_id.index(df_id)]).ad.set_length(length)
+            return "OK"
+        except Exception as e:
+            logger.error('%s', e)
+            return "ERROR"
