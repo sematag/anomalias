@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import anomalias.log as log
 
 import pandas as pd
+import numpy as np
 import os
 from pyzabbix import ZabbixMetric, ZabbixSender
 
@@ -114,7 +115,8 @@ class InfluxApi:
                     packet = []
                     for index, row in zabbix_out.iterrows():
                         logger.debug('Sending anomalies to zabbix')
-                        packet.append(ZabbixMetric(zbx_host, measurement + '_' + metric, row[metric]))
+                        packet.append(ZabbixMetric(zbx_host, measurement + '_' + metric, row[metric]),
+                                      clock=row['_time'].astype(np.int64) // 10**9)
                     self.__zbx_api.send(packet)
 
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
