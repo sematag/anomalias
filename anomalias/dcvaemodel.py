@@ -104,10 +104,10 @@ class DcvaeAD:
         predicted_sigma_values = np.squeeze(np.sqrt(np.exp(predicted_sigma_values)))
 
         # Only the newest predictions are taken
-        predicted_mean = pd.DataFrame(data=predicted_mean_values, index=df.index, 
-                                      columns=df.columns)
-        predicted_sigma = pd.DataFrame(data=predicted_sigma_values, index=df.index, 
-                                      columns=df.columns)
+        predicted_mean = pd.DataFrame(data=predicted_mean_values, index=df_X.index, 
+                                      columns=df_X.columns)
+        predicted_sigma = pd.DataFrame(data=predicted_sigma_values, index=df_X.index, 
+                                      columns=df_X.columns)
         if isinstance(predicted_mean, pd.Series):
             predicted_mean = predicted_mean.to_frame()
             predicted_sigma = predicted_sigma.to_frame()
