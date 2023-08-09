@@ -115,8 +115,8 @@ class InfluxApi:
                     packet = []
                     for index, row in zabbix_out.iterrows():
                         logger.debug('Sending anomalies to zabbix')
-                        packet.append(ZabbixMetric(zbx_host, measurement + '_' + metric, row[metric]),
-                                      clock=(index.value // 10 ** 9))
+                        packet.append(ZabbixMetric(zbx_host, measurement + '_' + metric, row[metric],
+                                                   clock=(index.value // 10 ** 9)))
                     self.__zbx_api.send(packet)
 
                 if anomaly_th_lower is not None and anomaly_th_upper is not None:
