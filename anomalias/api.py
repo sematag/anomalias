@@ -70,7 +70,7 @@ class DataModel(BaseModel):
     threshold: float = 4
     th_lower: float = None
     th_upper: float = None
-    serie_name: str = 'AACallCostHome'
+
 
 
 class InfluxApi:
@@ -203,7 +203,6 @@ def init(detectors):
                 model = DcvaeAD(th_sigma=data.threshold,
                               th_lower=data.th_lower,
                               th_upper=data.th_upper,
-                              serie=data.serie_name,
                               freq = data.freq
                               )
                 detectors.set_model(df_id, model)
