@@ -7,8 +7,8 @@ import pandas as pd
 import numpy as np
 
 
-index = pd.date_range('1/1/2000', periods=128, freq='10T')
-dat = pd.DataFrame({'AACallCostHome': range(128)} , index=index)
+index = pd.date_range('1/1/2000', periods=44, freq='15T')
+dat = pd.DataFrame({'AACallCostHome': range(44)} , index=index)
 dat.index.rename('_time', inplace=True)
 
 print(dat)
@@ -17,7 +17,7 @@ print(dat)
 
 print(dat.shape)
 
-model = DcvaeAD(scaler_filename='AACallCostHome_scaler', th_lower=0, th_upper=10)
+model = DcvaeAD(th_lower=0, th_upper=10)
 
 model.fit(dat)
 
