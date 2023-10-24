@@ -70,7 +70,7 @@ class DcvaeAD:
         #logger.info('Model Encoder:', self.__model_fit.encoder.summary())
         #logger.info('Model Decoder:', self.__model_fit.decoder.summary())
         #logger.info('Model VAE:', self.__model_fit.summary())
-
+        self.param_norm = 1
         
 
     def fit(self, df=None):
@@ -114,7 +114,6 @@ class DcvaeAD:
 
         predicted_mean = predicted_mean.asfreq(freq=self.__freq)
         predicted_sigma = predicted_sigma.asfreq(freq=self.__freq)
-        
         
         anomaly_th_lower = (predicted_mean - self.__th_sigma * predicted_sigma) * self.param_norm
         anomaly_th_upper = (predicted_mean + self.__th_sigma * predicted_sigma) * self.param_norm
