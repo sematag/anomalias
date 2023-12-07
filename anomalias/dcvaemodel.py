@@ -10,6 +10,7 @@ Created on Fri Apr 29 07:03:05 2022
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
 from tensorflow.keras import backend as K
+from tensorflow.keras import optimizers
 from tensorflow import keras
 import pandas as pd
 import numpy as np
@@ -64,21 +65,41 @@ class DcvaeAD:
         self.__model = None
         self.__init = True
         self.__trained = True
-        self.__model_fit = keras.models.load_model(model_path+model_name+'.h5',
-                                                    custom_objects={'sampling': Sampling},
-                                                    compile = True)
-        #logger.info('Model Encoder:', self.__model_fit.encoder.summary())
-        #logger.info('Model Decoder:', self.__model_fit.decoder.summary())
-        #logger.info('Model VAE:', self.__model_fit.summary())
+        self.__model_path = model_path
+        self.__model_name = model_name
         self.param_norm = 1
         
 
     def fit(self, df=None):
-        '''
-        Por ahora no creemos conveniente habilitar el entrenamiento para este método.
-        Como mucho se podría hacer un ajuste para una nueva serie. Pero eso queda para más adelante.
-        '''
-        self.param_norm = df.quantile(0.98)
+        # Data preprocess
+        # Normalization
+        self.param_norm = df_train.quantile(0.98)
+
+        df_X = df.asfreq(freq='5T', method='ffill').copy()
+        df_X = df_X/self.param_norm
+        X = samples2model(df_X, T=self.__T)
+        X = np.array(X)
+
+
+        # Load the base model
+        logger.info('Fitting DCVAE model.')
+        model_base = keras.models.load_model(self.__model_path+self.__model_name+'.h5',
+                                        custom_objects={'sampling': Sampling},
+                                        compile = True)
+        
+        model_base.summary()
+
+        opt = optimizers.Adam(learning_rate=1e-5)
+        model_base.compile(optimizer=opt)
+        early_stopping_cb = keras.callbacks.EarlyStopping(min_delta=1,
+                                                      patience=5,                                            
+                                                      verbose=1,
+                                                      mode='min')
+
+        model_base.fit(X, epochs=100, batch_size=64, shuffle=True, validation_split=0.2, callbacks=[early_stopping_cb])
+
+        # Save the model
+        model_base.save(self.__model_path+df.columns[0])
 
         return self
          
@@ -92,10 +113,10 @@ class DcvaeAD:
         
         X = samples2model(df_X, T=self.__T)
         X = np.array(X)
-        #X = np.expand_dims(X, axis=0)
 
         # Predictions
-        prediction = self.__model_fit(X)
+        model = keras.models.load_model(self.__model_path+df.columns[0])
+        prediction = model.predict(X)
 
         predicted_mean_values = np.concatenate((prediction[0][0,:,:], prediction[0][1:,-1,:]))
         predicted_sigma_values = np.concatenate((prediction[1][0,:,:], prediction[1][1:,-1,:]))
