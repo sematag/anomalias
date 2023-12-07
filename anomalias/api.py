@@ -200,7 +200,8 @@ def init(detectors):
                 detectors.set_model(df_id, model)
 
             elif model_id == 'DcvaeAD':
-                model = DcvaeAD(th_sigma=data.threshold,
+                model = DcvaeAD(id=df_id,
+                              th_sigma=data.threshold,
                               th_lower=data.th_lower,
                               th_upper=data.th_upper,
                               freq = data.freq

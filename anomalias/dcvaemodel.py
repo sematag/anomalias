@@ -45,7 +45,7 @@ class Sampling(Layer):
 
 
 class DcvaeAD:
-    def __init__(self, th_sigma=1, th_lower=None, th_upper=None,
+    def __init__(self, id='', th_sigma=1, th_lower=None, th_upper=None,
                  model_path='./anomalias/model_files/', 
                  model_name='dc-vae_global_best_model',
                  scaler_path='./anomalias/scaler_files/',
@@ -62,6 +62,7 @@ class DcvaeAD:
         self.__model_name = model_name
 
         logger.info('Model name: '+model_name)
+        self.__id = id
         self.__model = None
         self.__init = True
         self.__trained = True
@@ -73,7 +74,7 @@ class DcvaeAD:
     def fit(self, df=None):
         # Data preprocess
         # Normalization
-        self.param_norm = df_train.quantile(0.98)
+        self.param_norm = df.quantile(0.98)
 
         df_X = df.asfreq(freq='5T', method='ffill').copy()
         df_X = df_X/self.param_norm
@@ -99,7 +100,7 @@ class DcvaeAD:
         model_base.fit(X, epochs=100, batch_size=64, shuffle=True, validation_split=0.2, callbacks=[early_stopping_cb])
 
         # Save the model
-        model_base.save(self.__model_path+df.columns[0])
+        model_base.save(self.__model_path+self.__id)
 
         return self
          
@@ -115,7 +116,7 @@ class DcvaeAD:
         X = np.array(X)
 
         # Predictions
-        model = keras.models.load_model(self.__model_path+df.columns[0])
+        model = keras.models.load_model(self.__model_path+self.__id)
         prediction = model.predict(X)
 
         predicted_mean_values = np.concatenate((prediction[0][0,:,:], prediction[0][1:,-1,:]))
